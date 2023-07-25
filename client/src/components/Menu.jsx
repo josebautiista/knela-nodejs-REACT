@@ -14,8 +14,10 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import { useNavigate } from "react-router-dom";
 
 export default function Menu() {
+  const navigate = useNavigate();
   const [state, setState] = React.useState({
     left: false,
   });
@@ -42,10 +44,22 @@ export default function Menu() {
         {["Mesas", "Inventario", "Ventas"].map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+              <button
+                onClick={() => navigate(`/${text}`)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  color: "black",
+                }}
+              >
+                <ListItemIcon>
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </button>
             </ListItemButton>
           </ListItem>
         ))}

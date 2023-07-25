@@ -1,14 +1,21 @@
 import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Mesas from "./components/Mesas";
-import Prueba_DB from "./components/Prueba_DB";
 import Menu from "./components/menu";
+import Ventas from "./components/Ventas";
 
 function App() {
   return (
     <>
-      <Menu />
-      <Mesas />
-      <Prueba_DB />
+      <Router>
+        <Menu />
+        <Routes>
+          <Route path="/" element={<Mesas />} />
+          <Route path="/Mesas" element={<Mesas />} />
+          <Route path="/Ventas" element={<Ventas />} />
+          <Route path="/Inventario" element={<div></div>} />
+        </Routes>
+      </Router>
     </>
   );
 }

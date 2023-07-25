@@ -4,8 +4,118 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import styled from "styled-components";
+
+const DivContenedor = styled.div`
+  display: flex;
+  gap: 10px;
+  height: 80vh;
+`;
+
+const DivIzquierdo = styled.div`
+  width: 40%;
+  height: 100%;
+  background-color: transparent;
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+`;
+
+const ContainerDetallesProductos = styled.div`
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+`;
+
+const NombreColumnas = styled(Paper)`
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 10px;
+  font-weight: bold;
+  gap: 10px;
+  border: 1px solid #242424;
+`;
+
+const ProductoCarrito = styled(Paper)`
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 10px;
+  gap: 10px;
+`;
+
+const DivCantidad = styled.div`
+  width: 35%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const InputCantidad = styled.input`
+  width: 50px;
+  text-align: center;
+  background: white;
+  outline: none;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+const DivCentro = styled.div`
+  width: 20%;
+  height: 100%;
+  background: #242424;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 5px;
+`;
+
+const Categorias = styled(Paper)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  flex-grow: 1;
+  font-weight: bold;
+`;
+
+const DivDerecho = styled.div`
+  width: 40%;
+  height: 100%;
+  background: #242424;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-y: scroll;
+`;
+
+const ProductosAdd = styled(Paper)`
+  width: 130px;
+  height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+`;
 
 export const Detalles = ({
+  idMesa,
   addProducto,
   setAddProducto,
   eliminarProductosDeMesa,
@@ -62,20 +172,16 @@ export const Detalles = ({
   };
 
   const restarCantidad = (producto) => {
-    // Verificar si el producto existe en addProducto
     const existe = addProducto.find(
       (pro) => pro.producto_id === producto.producto_id
     );
 
     if (existe) {
-      // Actualizar la cantidad del producto
       const updatedAddProducto = addProducto.map((pro) =>
         pro.producto_id === producto.producto_id
           ? { ...pro, cantidad: pro.cantidad - 1 }
           : pro
       );
-
-      // Filtrar los productos con cantidad mayor que 0 y actualizar el estado
       setAddProducto(updatedAddProducto.filter((pro) => pro.cantidad > 0));
     }
   };
@@ -90,6 +196,7 @@ export const Detalles = ({
         precio: producto.precio_unitario * producto.cantidad,
         valor_total: producto.precio_unitario * producto.cantidad,
       })),
+      mesa_id: idMesa,
     };
 
     axios
@@ -108,76 +215,24 @@ export const Detalles = ({
   };
 
   return (
-    <div style={{ display: "flex", gap: "10px", height: "80vh" }}>
-      <div
-        style={{
-          width: "40%",
-          height: "100%",
-          background: "skyblue",
-          borderRadius: "5px",
-          boxSizing: "border-box",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: "10px",
-          padding: "10px",
-        }}
-      >
-        <div
-          style={{
-            overflowY: "scroll",
-            display: "flex",
-            flexDirection: "column",
-            gap: "5px",
-          }}
-          className="add-producto"
-        >
-          <Paper
-            style={{
-              width: "100%",
-              height: "50px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              boxSizing: "border-box",
-              padding: "10px",
-              fontWeight: "bold",
-              gap: "10px",
-            }}
-          >
+    <DivContenedor>
+      <DivIzquierdo>
+        <ContainerDetallesProductos className="add-producto">
+          <NombreColumnas>
             <div style={{ flexBasis: "40%" }}>Producto</div>
             <div style={{ flexBasis: "20%" }}>Cantidad</div>
             <div style={{ flexBasis: "20%" }}>Valor</div>
-          </Paper>
+          </NombreColumnas>
           {addProducto.map((producto, i) => (
-            <Paper
-              key={i}
-              style={{
-                width: "100%",
-                height: "50px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                boxSizing: "border-box",
-                padding: "10px",
-                gap: "10px",
-              }}
-            >
+            <ProductoCarrito key={i}>
               <div style={{ width: "60%" }}>{producto.nombre}</div>
-              <div
-                style={{
-                  width: "35%",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-              >
+              <DivCantidad>
                 <RemoveIcon
                   color="error"
                   sx={{ cursor: "pointer" }}
                   onClick={() => restarCantidad(producto)}
                 />
-                <input
+                <InputCantidad
                   type="tel"
                   value={producto.cantidad === 0 ? "" : producto.cantidad}
                   onChange={(e) => {
@@ -190,29 +245,19 @@ export const Detalles = ({
                       )
                     );
                   }}
-                  style={{
-                    width: "50px",
-                    textAlign: "center",
-                    background: "white",
-                    outline: "none",
-                    color: "black",
-                    border: "1px solid #ccc",
-                    borderRadius: "5px",
-                  }}
                 />
                 <AddIcon
                   color="success"
                   sx={{ cursor: "pointer" }}
                   onClick={() => agregarProducto(producto)}
                 />
-              </div>
+              </DivCantidad>
               <div style={{ width: "25%" }}>
                 $ {formatNumber(producto.precio_unitario * producto.cantidad)}
               </div>
-              <div style={{}}></div>
-            </Paper>
+            </ProductoCarrito>
           ))}
-        </div>
+        </ContainerDetallesProductos>
         <div>
           <Paper
             style={{
@@ -247,67 +292,24 @@ export const Detalles = ({
             </Button>
           </Paper>
         </div>
-      </div>
+      </DivIzquierdo>
 
-      <div
-        style={{
-          width: "20%",
-          height: "100%",
-          background: "skyblue",
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          boxSizing: "border-box",
-          padding: "10px",
-          borderRadius: "5px",
-        }}
-      >
+      <DivCentro>
         {categorias.map((cat, i) => (
-          <Paper
-            key={i}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              flexGrow: 1,
-            }}
-            onClick={() => handleClick(cat.categoria_id)}
-          >
+          <Categorias key={i} onClick={() => handleClick(cat.categoria_id)}>
             {cat.nombre}
-          </Paper>
+          </Categorias>
         ))}
-      </div>
-      <div
-        style={{
-          width: "40%",
-          height: "100%",
-          background: "skyblue",
-          boxSizing: "border-box",
-          padding: "10px",
-          borderRadius: "5px",
-          overflowY: "scroll",
-        }}
-        className="productos"
-      >
+      </DivCentro>
+
+      <DivDerecho className="productos">
         {productos.map((producto, i) => (
-          <Paper
-            key={i}
-            style={{
-              width: "130px",
-              height: "130px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-            }}
-            onClick={() => agregarProducto(producto)}
-          >
+          <ProductosAdd key={i} onClick={() => agregarProducto(producto)}>
             {producto.nombre}
-          </Paper>
+          </ProductosAdd>
         ))}
-      </div>
-    </div>
+      </DivDerecho>
+    </DivContenedor>
   );
 };
 

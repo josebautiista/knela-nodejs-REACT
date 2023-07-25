@@ -12,6 +12,10 @@
   display: none;
 }
 
+.detalles_venta::-webkit-scrollbar{
+  display: none;
+}
+
 .productos::-webkit-scrollbar{
   display: none;
 }

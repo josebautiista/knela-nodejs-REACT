@@ -123,6 +123,7 @@ app.post("/carrito_compras", (req, res) => {
   if (!mesa_id || !producto_id || !cantidad) {
     return res.status(400).json({ error: "Faltan datos requeridos" });
   }
+
   const insertQuery =
     "INSERT INTO carrito_compras (mesa_id, producto_id, cantidad) VALUES (?, ?, ?)";
   connection.query(
@@ -138,12 +139,60 @@ app.post("/carrito_compras", (req, res) => {
           error: "Error al insertar el producto en el carrito de compras.",
         });
       } else {
-        res.status(201).json({
-          message: "Producto agregado al carrito de compras exitosamente.",
+        // Actualizar el estado de la mesa a "Ocupada" en la tabla "Mesas"
+        const updateMesaQuery =
+          "UPDATE Mesas SET estado = 'Ocupada' WHERE mesa_id = ?";
+        connection.query(updateMesaQuery, [mesa_id], (error) => {
+          if (error) {
+            console.error("Error al actualizar el estado de la mesa:", error);
+          } else {
+            res.status(201).json({
+              message: "Producto agregado al carrito de compras exitosamente.",
+            });
+          }
         });
       }
     }
   );
+});
+
+app.get("/ventas", (req, res) => {
+  // Consulta SQL para obtener todas las ventas con los datos del cliente
+  const query = `
+    SELECT v.*, c.nombre AS nombre_cliente, c.telefono AS telefono_cliente, c.email AS email_cliente
+    FROM Ventas v
+    JOIN Clientes c ON v.cliente_id = c.cliente_id`;
+
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.error("Error al obtener las ventas:", error);
+      res.status(500).json({ error: "Error al obtener las ventas" });
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+app.get("/detalles_venta", (req, res) => {
+  const ventaId = req.query.venta_id;
+
+  // Consulta SQL para obtener los detalles de la venta y los datos del producto asociado
+  const query = `
+    SELECT dv.detalle_id, dv.venta_id, dv.producto_id, dv.cantidad, dv.valor_total, p.nombre AS nombre_producto, p.precio_unitario AS precio_producto
+    FROM Detalles_Venta dv
+    JOIN Productos p ON dv.producto_id = p.producto_id
+    WHERE dv.venta_id = ?`;
+
+  connection.query(query, [ventaId], (error, results) => {
+    if (error) {
+      console.error("Error al obtener los detalles de la venta:", error);
+      res
+        .status(500)
+        .json({ error: "Error al obtener los detalles de la venta" });
+    } else {
+      res.status(200).json(results);
+    }
+  });
 });
 
 app.post("/ventas", (req, res) => {
@@ -161,7 +210,6 @@ app.post("/ventas", (req, res) => {
       const venta_id = result.insertId;
 
       // Insertar los detalles de la venta en la tabla "Detalles_Venta"
-
       const detallesVenta = req.body.detalles;
       const insertDetallesQuery =
         "INSERT INTO Detalles_Venta (venta_id, producto_id, cantidad, valor_total) VALUES (?, ?, ?, ?)";
@@ -184,6 +232,19 @@ app.post("/ventas", (req, res) => {
       connection.query(updateVentaQuery, [venta_id, venta_id], (error) => {
         if (error) {
           console.error("Error al calcular el total de la venta:", error);
+        } else {
+          // Actualizar el estado de la mesa a "Disponible" en la tabla "Mesas"
+          console.log(req.body.mesa_id);
+          const mesa_id = req.body.mesa_id; // Suponiendo que recibes el ID de la mesa en el cuerpo de la solicitud
+          console.log("vamos a agregar", mesa_id);
+          const updateMesaQuery =
+            "UPDATE Mesas SET estado = 'Disponible' WHERE mesa_id = ?";
+          connection.query(updateMesaQuery, [mesa_id], (error) => {
+            if (error) {
+              console.error("Error al actualizar el estado de la mesa:", error);
+            }
+          });
+          console.log("mesa actualizada");
         }
       });
 
