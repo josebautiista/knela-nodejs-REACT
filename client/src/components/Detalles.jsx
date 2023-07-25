@@ -3,8 +3,13 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
-export const Detalles = ({ idMesa, addProducto, setAddProducto }) => {
+export const Detalles = ({
+  addProducto,
+  setAddProducto,
+  eliminarProductosDeMesa,
+}) => {
   const [categorias, setCategorias] = useState([]);
   const [productos, setProductos] = useState([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
@@ -75,24 +80,11 @@ export const Detalles = ({ idMesa, addProducto, setAddProducto }) => {
     }
   };
 
-  useEffect(() => {
-    // Cuando el componente se monta, obtén los datos almacenados en localStorage
-    const storedProductos = localStorage.getItem(`productosMesa${idMesa}`);
-    if (storedProductos) {
-      setAddProducto(JSON.parse(storedProductos));
-    }
-  }, [idMesa]);
-
-  useEffect(() => {
-    // Cuando addProducto cambie, actualiza los datos almacenados en localStorage
-    localStorage.setItem(`productosMesa${idMesa}`, JSON.stringify(addProducto));
-  }, [idMesa, addProducto]);
-  console.log("producto: ", addProducto);
   const registrarVenta = () => {
     const nuevaVenta = {
       cliente_id: 1,
       detalles: addProducto.map((producto) => ({
-        producto_id: producto.producto_id, // Asegúrate de que aquí sea producto_id
+        producto_id: producto.producto_id,
         nombre_producto: producto.nombre,
         cantidad: producto.cantidad,
         precio: producto.precio_unitario * producto.cantidad,
@@ -102,13 +94,12 @@ export const Detalles = ({ idMesa, addProducto, setAddProducto }) => {
 
     axios
       .post("http://localhost:3000/ventas", nuevaVenta)
-      .then((response) => {
-        console.log("Nueva venta creada:", response.data);
-        // Aquí puedes realizar acciones adicionales después de crear la venta, como mostrar un mensaje de éxito o redirigir a otra página
+      .then(() => {
+        eliminarProductosDeMesa();
+        setAddProducto([]);
       })
       .catch((error) => {
         console.error("Error al crear la nueva venta:", error);
-        // En caso de error, puedes mostrar un mensaje de error al usuario o realizar otras acciones según sea necesario
       });
   };
 
@@ -318,6 +309,13 @@ export const Detalles = ({ idMesa, addProducto, setAddProducto }) => {
       </div>
     </div>
   );
+};
+
+Detalles.propTypes = {
+  idMesa: PropTypes.number.isRequired,
+  addProducto: PropTypes.array.isRequired,
+  setAddProducto: PropTypes.func.isRequired,
+  eliminarProductosDeMesa: PropTypes.func.isRequired,
 };
 
 export default Detalles;

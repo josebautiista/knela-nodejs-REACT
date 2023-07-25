@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Box, Modal } from "@mui/material";
 import { Detalles } from "./Detalles";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 const style = {
   position: "absolute",
@@ -66,22 +67,20 @@ export default function Mesa({ id }) {
     return axios.delete(`http://localhost:3000/carrito_compras/${id}`);
   };
 
-  useEffect(() => {
-    obtenerProductosEnCarrito();
-  }, [id]); // El useEffect se ejecutará cada vez que el ID de la mesa cambie
-
-  const obtenerProductosEnCarrito = () => {
+  const obtenerProductosEnCarrito = useCallback(() => {
     axios
       .get(`http://localhost:3000/carrito_compras/${id}`)
       .then((response) => {
-        console.log(response.data);
-        // Actualizamos el estado addProducto con los productos obtenidos
         setAddProducto(response.data);
       })
       .catch((error) => {
         console.error("Error al obtener productos en carrito:", error);
       });
-  };
+  }, [id]);
+
+  useEffect(() => {
+    obtenerProductosEnCarrito();
+  }, [id, obtenerProductosEnCarrito]);
 
   return (
     <div>
@@ -95,6 +94,7 @@ export default function Mesa({ id }) {
               idMesa={id}
               addProducto={addProducto}
               setAddProducto={setAddProducto}
+              eliminarProductosDeMesa={eliminarProductosDeMesa}
             />
           )}
         </Box>
@@ -102,3 +102,6 @@ export default function Mesa({ id }) {
     </div>
   );
 }
+Mesa.propTypes = {
+  id: PropTypes.number.isRequired,
+};

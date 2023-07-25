@@ -166,7 +166,6 @@ app.post("/ventas", (req, res) => {
       const insertDetallesQuery =
         "INSERT INTO Detalles_Venta (venta_id, producto_id, cantidad, valor_total) VALUES (?, ?, ?, ?)";
       detallesVenta.forEach((detalle) => {
-        console.log("detalle:", detalle);
         const { producto_id, cantidad, valor_total } = detalle;
         connection.query(
           insertDetallesQuery,
