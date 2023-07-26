@@ -127,7 +127,7 @@ export default function Ventas() {
                     <TableRow>
                       <TableCell>Producto</TableCell>
                       <TableCell>Cantidad</TableCell>
-                      <TableCell>Precio Unit</TableCell>
+                      <TableCell>Precio venta</TableCell>
                       <TableCell>Valor Total</TableCell>
                     </TableRow>
                   </TableHead>
@@ -136,7 +136,7 @@ export default function Ventas() {
                       <TableRow key={index}>
                         <TableCell>{detalle.nombre_producto}</TableCell>
                         <TableCell>{detalle.cantidad}</TableCell>
-                        <TableCell>{detalle.precio_producto}</TableCell>
+                        <TableCell>{detalle.precio_venta}</TableCell>
                         <TableCell>{detalle.valor_total}</TableCell>
                       </TableRow>
                     ))}

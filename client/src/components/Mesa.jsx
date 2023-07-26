@@ -34,17 +34,17 @@ export default function Mesa({ id }) {
     setOpen(false);
     agregarProductosAlCarrito();
   };
-
   const agregarProductosAlCarrito = () => {
-    // Primero, eliminar los productos asociados a la mesa de la base de datos
     eliminarProductosDeMesa()
       .then(() => {
         // Después de eliminar los productos, agregar los nuevos al carrito
         addProducto.forEach((producto) => {
+          console.log(producto);
           const carritoData = {
             mesa_id: id,
             producto_id: producto.producto_id,
             cantidad: producto.cantidad,
+            precio_venta: producto.precio_venta,
           };
 
           axios
@@ -63,7 +63,6 @@ export default function Mesa({ id }) {
   };
 
   const eliminarProductosDeMesa = () => {
-    // Retorna una promesa que resuelve cuando se eliminan los productos
     return axios.delete(`http://localhost:3000/carrito_compras/${id}`);
   };
 
@@ -71,7 +70,12 @@ export default function Mesa({ id }) {
     axios
       .get(`http://localhost:3000/carrito_compras/${id}`)
       .then((response) => {
-        setAddProducto(response.data);
+        const productos = response.data.map((producto) => ({
+          ...producto,
+          precio_venta: producto.precio_unitario,
+        }));
+
+        setAddProducto(productos);
       })
       .catch((error) => {
         console.error("Error al obtener productos en carrito:", error);

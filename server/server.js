@@ -72,8 +72,6 @@ app.get("/products", (req, res) => {
   });
 });
 
-// Agrega esta nueva ruta al final de tu archivo de servidor Express
-
 app.get("/carrito_compras/:mesa_id", (req, res) => {
   const mesaId = req.params.mesa_id;
 
@@ -110,25 +108,22 @@ app.delete("/carrito_compras/:mesa_id", (req, res) => {
         .status(500)
         .json({ error: "Error al eliminar productos del carrito de compras" });
     } else {
-      console.log(
-        `Se han eliminado los productos asociados a la mesa ${mesaId}`
-      );
       res.status(200).json({ message: "Productos eliminados correctamente" });
     }
   });
 });
 
 app.post("/carrito_compras", (req, res) => {
-  const { mesa_id, producto_id, cantidad } = req.body;
-  if (!mesa_id || !producto_id || !cantidad) {
+  const { mesa_id, producto_id, cantidad, precio_venta } = req.body;
+  if (!mesa_id || !producto_id || !cantidad || precio_venta) {
     return res.status(400).json({ error: "Faltan datos requeridos" });
   }
 
   const insertQuery =
-    "INSERT INTO carrito_compras (mesa_id, producto_id, cantidad) VALUES (?, ?, ?)";
+    "INSERT INTO carrito_compras (mesa_id, producto_id, cantidad, precio_venta) VALUES (?, ?, ?, ?)";
   connection.query(
     insertQuery,
-    [mesa_id, producto_id, cantidad],
+    [mesa_id, producto_id, cantidad, precio_venta],
     (error, results, fields) => {
       if (error) {
         console.error(
@@ -157,7 +152,6 @@ app.post("/carrito_compras", (req, res) => {
 });
 
 app.get("/ventas", (req, res) => {
-  // Consulta SQL para obtener todas las ventas con los datos del cliente
   const query = `
     SELECT v.*, c.nombre AS nombre_cliente, c.telefono AS telefono_cliente, c.email AS email_cliente
     FROM Ventas v
@@ -178,7 +172,7 @@ app.get("/detalles_venta", (req, res) => {
 
   // Consulta SQL para obtener los detalles de la venta y los datos del producto asociado
   const query = `
-    SELECT dv.detalle_id, dv.venta_id, dv.producto_id, dv.cantidad, dv.valor_total, p.nombre AS nombre_producto, p.precio_unitario AS precio_producto
+    SELECT dv.detalle_id, dv.venta_id, dv.producto_id, dv.cantidad, dv.precio_venta, dv.valor_total, p.nombre AS nombre_producto, p.precio_unitario AS precio_producto
     FROM Detalles_Venta dv
     JOIN Productos p ON dv.producto_id = p.producto_id
     WHERE dv.venta_id = ?`;
@@ -198,7 +192,6 @@ app.get("/detalles_venta", (req, res) => {
 app.post("/ventas", (req, res) => {
   const { cliente_id } = req.body;
 
-  // Insertar la venta en la tabla "Ventas"
   const insertVentaQuery =
     "INSERT INTO Ventas (cliente_id, fecha_hora, total) VALUES (?, NOW(), 0)";
   connection.query(insertVentaQuery, [cliente_id], (error, result) => {
@@ -206,18 +199,17 @@ app.post("/ventas", (req, res) => {
       console.error("Error al insertar la venta:", error);
       res.status(500).json({ error: "Error al insertar la venta" });
     } else {
-      // Obtener el venta_id de la venta recién insertada
       const venta_id = result.insertId;
 
-      // Insertar los detalles de la venta en la tabla "Detalles_Venta"
       const detallesVenta = req.body.detalles;
       const insertDetallesQuery =
-        "INSERT INTO Detalles_Venta (venta_id, producto_id, cantidad, valor_total) VALUES (?, ?, ?, ?)";
+        "INSERT INTO Detalles_Venta (venta_id, producto_id, cantidad, precio_venta, valor_total) VALUES (?, ?, ?, ?, ?)";
       detallesVenta.forEach((detalle) => {
-        const { producto_id, cantidad, valor_total } = detalle;
+        const { producto_id, cantidad, precio_venta } = detalle;
+        const valor_total = precio_venta * cantidad;
         connection.query(
           insertDetallesQuery,
-          [venta_id, producto_id, cantidad, valor_total],
+          [venta_id, producto_id, cantidad, precio_venta, valor_total],
           (error) => {
             if (error) {
               console.error("Error al insertar detalle de venta:", error);
@@ -228,15 +220,12 @@ app.post("/ventas", (req, res) => {
 
       // Calcular el total de la venta y actualizar la tabla "Ventas"
       const updateVentaQuery =
-        "UPDATE Ventas SET total = (SELECT SUM(Productos.precio_unitario * Detalles_Venta.cantidad) FROM Productos JOIN Detalles_Venta ON Productos.producto_id = Detalles_Venta.producto_id WHERE Detalles_Venta.venta_id = ?) WHERE venta_id = ?";
+        "UPDATE Ventas SET total = (SELECT SUM(Detalles_Venta.valor_total) FROM Detalles_Venta WHERE Detalles_Venta.venta_id = ?) WHERE venta_id = ?";
       connection.query(updateVentaQuery, [venta_id, venta_id], (error) => {
         if (error) {
           console.error("Error al calcular el total de la venta:", error);
         } else {
-          // Actualizar el estado de la mesa a "Disponible" en la tabla "Mesas"
-          console.log(req.body.mesa_id);
-          const mesa_id = req.body.mesa_id; // Suponiendo que recibes el ID de la mesa en el cuerpo de la solicitud
-          console.log("vamos a agregar", mesa_id);
+          const mesa_id = req.body.mesa_id;
           const updateMesaQuery =
             "UPDATE Mesas SET estado = 'Disponible' WHERE mesa_id = ?";
           connection.query(updateMesaQuery, [mesa_id], (error) => {
@@ -244,7 +233,6 @@ app.post("/ventas", (req, res) => {
               console.error("Error al actualizar el estado de la mesa:", error);
             }
           });
-          console.log("mesa actualizada");
         }
       });
 
@@ -252,8 +240,6 @@ app.post("/ventas", (req, res) => {
     }
   });
 });
-
-// Resto del código del backend...
 
 connection.connect((err) => {
   if (err) {

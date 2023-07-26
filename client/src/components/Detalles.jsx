@@ -144,7 +144,12 @@ export const Detalles = ({
       axios
         .get(`http://localhost:3000/productos?id=${categoriaSeleccionada}`)
         .then((response) => {
-          setProductos(response.data);
+          const productos = response.data.map((producto) => ({
+            ...producto,
+            precio_venta: producto.precio_unitario,
+          }));
+
+          setProductos(productos);
         })
         .catch((error) => {
           console.error("Error al obtener datos de la API:", error);
@@ -193,8 +198,8 @@ export const Detalles = ({
         producto_id: producto.producto_id,
         nombre_producto: producto.nombre,
         cantidad: producto.cantidad,
-        precio: producto.precio_unitario * producto.cantidad,
-        valor_total: producto.precio_unitario * producto.cantidad,
+        precio_venta: producto.precio_venta,
+        valor_total: producto.precio_venta * producto.cantidad,
       })),
       mesa_id: idMesa,
     };
@@ -252,9 +257,30 @@ export const Detalles = ({
                   onClick={() => agregarProducto(producto)}
                 />
               </DivCantidad>
-              <div style={{ width: "25%" }}>
-                $ {formatNumber(producto.precio_unitario * producto.cantidad)}
-              </div>
+
+              <InputCantidad
+                type="tel"
+                value={
+                  (producto.precio_venta !== undefined
+                    ? producto.precio_venta
+                    : "") * producto.cantidad
+                }
+                onChange={(e) => {
+                  const nuevoPrecio = parseInt(e.target.value);
+                  setAddProducto((prevAddProducto) =>
+                    prevAddProducto.map((prod) =>
+                      prod.producto_id === producto.producto_id
+                        ? {
+                            ...prod,
+                            precio_venta: isNaN(nuevoPrecio)
+                              ? undefined
+                              : nuevoPrecio,
+                          }
+                        : prod
+                    )
+                  );
+                }}
+              />
             </ProductoCarrito>
           ))}
         </ContainerDetallesProductos>
@@ -277,7 +303,10 @@ export const Detalles = ({
               {formatNumber(
                 addProducto
                   .map(
-                    (producto) => producto.precio_unitario * producto.cantidad
+                    (producto) =>
+                      (producto.precio_venta !== undefined
+                        ? producto.precio_venta
+                        : producto.precio_unitario) * producto.cantidad
                   )
                   .reduce((total, valor) => total + valor, 0)
               )}
