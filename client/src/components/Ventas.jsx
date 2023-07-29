@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -14,12 +13,20 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField"; // Importa el componente TextField
+import { useEffect, useState } from "react";
 
 export default function Ventas() {
   const [ventas, setVentas] = useState([]);
   const [selectedVenta, setSelectedVenta] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [detalleVentas, setDetalleVentas] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().slice(0, 10); // Formato AAAA-MM-DD
+  });
+  const [filteredVentas, setFilteredVentas] = useState([]); // Estado para almacenar las ventas filtradas
+  const [totalVentas, setTotalVentas] = useState(0); // Estado para almacenar el total de las ventas filtradas
 
   useEffect(() => {
     // Realizar la solicitud HTTP para obtener los datos de ventas desde la API
@@ -75,11 +82,72 @@ export default function Ventas() {
     });
     return `${date} ${time}`;
   };
+
+  const formatNumber = (number) => {
+    const optionsCOP = {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+      useGrouping: true,
+    };
+    return number.toLocaleString("es-CO", optionsCOP);
+  };
+
+  // Función para filtrar las ventas por fecha y calcular el total de las ventas filtradas
+  const handleFilterVentas = () => {
+    if (selectedDate) {
+      const fecha = new Date(selectedDate).toISOString().slice(0, 10);
+      const filteredVentas = ventas.filter((venta) => {
+        const ventaDate = new Date(venta.fecha_hora).toISOString().slice(0, 10);
+        console.log(ventaDate, fecha);
+        return ventaDate === fecha;
+      });
+
+      console.log(filteredVentas);
+      setFilteredVentas(filteredVentas);
+
+      const totalVentas = filteredVentas.reduce(
+        (total, venta) => total + venta.total,
+        0
+      );
+      setTotalVentas(totalVentas);
+    } else {
+      // Si no hay una fecha seleccionada, muestra todas las ventas
+      setFilteredVentas(ventas);
+      const totalVentas = ventas.reduce(
+        (total, venta) => total + venta.total,
+        0
+      );
+      setTotalVentas(totalVentas);
+    }
+  };
+
   return (
     <Box p={3}>
-      <Typography variant="h5" gutterBottom>
-        Ventas
-      </Typography>
+      <div style={{ display: "flex", gap: "100px", margin: "30px" }}>
+        <Typography variant="h5" gutterBottom>
+          Ventas
+        </Typography>
+
+        {/* Campo de entrada tipo fecha */}
+        <TextField
+          label="Filtrar por fecha"
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+
+        {/* Botón para realizar la búsqueda */}
+        <Button variant="contained" onClick={handleFilterVentas}>
+          Buscar Ventas
+        </Button>
+      </div>
+
+      {/* Tabla de ventas */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -91,7 +159,7 @@ export default function Ventas() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {ventas.map((venta, i) => (
+            {filteredVentas.map((venta, i) => (
               <TableRow
                 key={i}
                 sx={{ cursor: "pointer" }}
@@ -100,7 +168,7 @@ export default function Ventas() {
                 <TableCell>{venta.venta_id}</TableCell>
                 <TableCell>{venta.nombre_cliente}</TableCell>
                 <TableCell>{formatDateTime(venta.fecha_hora)}</TableCell>
-                <TableCell>{venta.total}</TableCell>
+                <TableCell>{formatNumber(venta.total)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -135,14 +203,18 @@ export default function Ventas() {
                       <TableRow key={index}>
                         <TableCell>{detalle.nombre_producto}</TableCell>
                         <TableCell>{detalle.cantidad}</TableCell>
-                        <TableCell>{detalle.precio_venta}</TableCell>
-                        <TableCell>{detalle.valor_total}</TableCell>
+                        <TableCell>
+                          {formatNumber(detalle.precio_venta)}
+                        </TableCell>
+                        <TableCell>
+                          {formatNumber(detalle.valor_total)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-              <p>Total: {selectedVenta.total}</p>
+              <p>Total: {formatNumber(selectedVenta.total)}</p>
             </div>
           )}
         </DialogContent>
@@ -150,6 +222,10 @@ export default function Ventas() {
           <Button onClick={handleCloseModal}>Cerrar</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Total de las ventas filtradas */}
+      <Typography variant="h6">Total Ventas:</Typography>
+      <Typography variant="subtitle1">{formatNumber(totalVentas)}</Typography>
     </Box>
   );
 }
