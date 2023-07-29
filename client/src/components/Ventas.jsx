@@ -36,6 +36,9 @@ export default function Ventas() {
         // Filtrar las ventas duplicadas por su venta_id
         const uniqueVentas = getUniqueVentas(response.data, "venta_id");
         setVentas(uniqueVentas);
+
+        // Mostrar todas las ventas al cargar el componente
+        handleFilterVentas();
       })
       .catch((error) => {
         console.error("Error al obtener los datos de ventas:", error);
@@ -68,7 +71,6 @@ export default function Ventas() {
       });
   };
 
-  // Función para cerrar el modal
   const handleCloseModal = () => {
     setOpenModal(false);
   };
@@ -100,11 +102,9 @@ export default function Ventas() {
       const fecha = new Date(selectedDate).toISOString().slice(0, 10);
       const filteredVentas = ventas.filter((venta) => {
         const ventaDate = new Date(venta.fecha_hora).toISOString().slice(0, 10);
-        console.log(ventaDate, fecha);
         return ventaDate === fecha;
       });
 
-      console.log(filteredVentas);
       setFilteredVentas(filteredVentas);
 
       const totalVentas = filteredVentas.reduce(
@@ -125,26 +125,62 @@ export default function Ventas() {
 
   return (
     <Box p={3}>
-      <div style={{ display: "flex", gap: "100px", margin: "30px" }}>
-        <Typography variant="h5" gutterBottom>
-          Ventas
-        </Typography>
-
-        {/* Campo de entrada tipo fecha */}
-        <TextField
-          label="Filtrar por fecha"
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          InputLabelProps={{
-            shrink: true,
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          margin: "30px",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="h4">Ventas</Typography>
+        <div
+          style={{
+            display: "flex",
+            gap: "20px",
+            alignItems: "center",
+            boxSizing: "border-box",
+            padding: "10px",
+            background: "white",
+            borderRadius: "5px",
           }}
-        />
+        >
+          {/* Campo de entrada tipo fecha */}
+          <TextField
+            label="Filtrar por fecha"
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
+            InputProps={{ style: { colorScheme: "none" } }}
+          />
 
-        {/* Botón para realizar la búsqueda */}
-        <Button variant="contained" onClick={handleFilterVentas}>
-          Buscar Ventas
-        </Button>
+          {/* Botón para realizar la búsqueda */}
+          <Button
+            color="primary"
+            size="medium"
+            variant="contained"
+            onClick={handleFilterVentas}
+            sx={{ height: "70%" }}
+          >
+            Buscar
+          </Button>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            AlignItems: "center",
+            gap: "10px",
+            width: "40%",
+            justifyContent: "center",
+          }}
+        >
+          <Typography variant="h4">Total Ventas:</Typography>
+          <Typography variant="h4">{formatNumber(totalVentas)}</Typography>
+        </div>
       </div>
 
       {/* Tabla de ventas */}
@@ -152,10 +188,10 @@ export default function Ventas() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID Venta</TableCell>
-              <TableCell>Nombre Cliente</TableCell>
-              <TableCell>Fecha y Hora</TableCell>
-              <TableCell>Total</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>ID Venta</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Nombre Cliente</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Fecha y Hora</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Total</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -222,10 +258,6 @@ export default function Ventas() {
           <Button onClick={handleCloseModal}>Cerrar</Button>
         </DialogActions>
       </Dialog>
-
-      {/* Total de las ventas filtradas */}
-      <Typography variant="h6">Total Ventas:</Typography>
-      <Typography variant="subtitle1">{formatNumber(totalVentas)}</Typography>
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { Button, Paper } from "@mui/material";
+import { Button, Paper, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
@@ -115,7 +115,6 @@ const ProductosAdd = styled(Paper)`
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  font-weight: bold;
 `;
 
 export const Detalles = ({
@@ -231,126 +230,136 @@ export const Detalles = ({
   };
 
   return (
-    <DivContenedor>
-      <DivIzquierdo>
-        <ContainerDetallesProductos className="add-producto">
-          <NombreColumnas>
-            <div style={{ flexBasis: "40%" }}>Producto</div>
-            <div style={{ flexBasis: "20%" }}>Cantidad</div>
-            <div style={{ flexBasis: "20%" }}>Valor</div>
-          </NombreColumnas>
-          {addProducto.map((producto, i) => (
-            <ProductoCarrito key={i}>
-              <div style={{ width: "60%" }}>{producto.nombre}</div>
-              <DivCantidad>
-                <RemoveIcon
-                  color="error"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => restarCantidad(producto)}
-                />
+    <>
+      <Typography
+        variant="h4"
+        sx={{ textAlign: "center", marginBottom: "20px" }}
+      >
+        Mesa {idMesa}
+      </Typography>
+      <DivContenedor>
+        <DivIzquierdo>
+          <ContainerDetallesProductos className="add-producto">
+            <NombreColumnas>
+              <div style={{ flexBasis: "40%" }}>Producto</div>
+              <div style={{ flexBasis: "20%" }}>Cantidad</div>
+              <div style={{ flexBasis: "20%" }}>Valor</div>
+            </NombreColumnas>
+            {addProducto.map((producto, i) => (
+              <ProductoCarrito key={i}>
+                <div style={{ width: "60%" }}>{producto.nombre}</div>
+                <DivCantidad>
+                  <RemoveIcon
+                    color="error"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => restarCantidad(producto)}
+                  />
+                  <InputCantidad
+                    type="tel"
+                    value={producto.cantidad === 0 ? "" : producto.cantidad}
+                    onChange={(e) => {
+                      const nuevaCantidad = parseInt(e.target.value, 10) || 0;
+                      setAddProducto((prevAddProducto) =>
+                        prevAddProducto.map((pro) =>
+                          pro.producto_id === producto.producto_id
+                            ? { ...pro, cantidad: nuevaCantidad }
+                            : pro
+                        )
+                      );
+                    }}
+                  />
+                  <AddIcon
+                    color="success"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => agregarProducto(producto)}
+                  />
+                </DivCantidad>
+
                 <InputCantidad
                   type="tel"
-                  value={producto.cantidad === 0 ? "" : producto.cantidad}
+                  value={
+                    (producto.precio_venta !== undefined
+                      ? producto.precio_venta
+                      : "") * producto.cantidad
+                  }
                   onChange={(e) => {
-                    const nuevaCantidad = parseInt(e.target.value, 10) || 0;
+                    const nuevoPrecio = parseInt(e.target.value);
                     setAddProducto((prevAddProducto) =>
-                      prevAddProducto.map((pro) =>
-                        pro.producto_id === producto.producto_id
-                          ? { ...pro, cantidad: nuevaCantidad }
-                          : pro
+                      prevAddProducto.map((prod) =>
+                        prod.producto_id === producto.producto_id
+                          ? {
+                              ...prod,
+                              precio_venta: isNaN(nuevoPrecio)
+                                ? undefined
+                                : nuevoPrecio,
+                            }
+                          : prod
                       )
                     );
                   }}
                 />
-                <AddIcon
-                  color="success"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => agregarProducto(producto)}
-                />
-              </DivCantidad>
-
-              <InputCantidad
-                type="tel"
-                value={
-                  (producto.precio_venta !== undefined
-                    ? producto.precio_venta
-                    : "") * producto.cantidad
-                }
-                onChange={(e) => {
-                  const nuevoPrecio = parseInt(e.target.value);
-                  setAddProducto((prevAddProducto) =>
-                    prevAddProducto.map((prod) =>
-                      prod.producto_id === producto.producto_id
-                        ? {
-                            ...prod,
-                            precio_venta: isNaN(nuevoPrecio)
-                              ? undefined
-                              : nuevoPrecio,
-                          }
-                        : prod
-                    )
-                  );
-                }}
-              />
-            </ProductoCarrito>
-          ))}
-        </ContainerDetallesProductos>
-        <div>
-          <Paper
-            style={{
-              width: "100%",
-              height: "100px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "flex-end",
-              flexDirection: "column",
-              boxSizing: "border-box",
-              padding: "30px",
-              fontSize: "2rem",
-            }}
-          >
-            <div>
-              Total:{" "}
-              {formatNumber(
-                addProducto
-                  .map(
-                    (producto) =>
-                      (producto.precio_venta !== undefined
-                        ? producto.precio_venta
-                        : producto.precio_unitario) * producto.cantidad
-                  )
-                  .reduce((total, valor) => total + valor, 0)
-              )}
-            </div>
-            <Button
-              size="large"
-              color="success"
-              sx={{ border: "1px solid green" }}
-              onClick={registrarVenta}
+              </ProductoCarrito>
+            ))}
+          </ContainerDetallesProductos>
+          <div>
+            <Paper
+              style={{
+                width: "100%",
+                height: "150px",
+                display: "flex",
+                justifyContent: "space-around",
+                alignItems: "flex-end",
+                flexDirection: "column",
+                boxSizing: "border-box",
+                padding: "10px",
+                fontSize: "2rem",
+              }}
             >
-              Cobrar
-            </Button>
-          </Paper>
-        </div>
-      </DivIzquierdo>
+              <div>
+                Total:{" "}
+                {formatNumber(
+                  addProducto
+                    .map(
+                      (producto) =>
+                        (producto.precio_venta !== undefined
+                          ? producto.precio_venta
+                          : producto.precio_unitario) * producto.cantidad
+                    )
+                    .reduce((total, valor) => total + valor, 0)
+                )}
+              </div>
+              <Button
+                color="success"
+                size="large"
+                variant="contained"
+                onClick={registrarVenta}
+              >
+                Cobrar
+              </Button>
+            </Paper>
+          </div>
+        </DivIzquierdo>
 
-      <DivCentro>
-        {categorias.map((cat, i) => (
-          <Categorias key={i} onClick={() => handleClick(cat.categoria_id)}>
-            {cat.nombre}
-          </Categorias>
-        ))}
-      </DivCentro>
+        <DivCentro>
+          {categorias.map((cat, i) => (
+            <Categorias key={i} onClick={() => handleClick(cat.categoria_id)}>
+              {cat.nombre}
+            </Categorias>
+          ))}
+        </DivCentro>
 
-      <DivDerecho className="productos">
-        {productos.map((producto, i) => (
-          <ProductosAdd key={i} onClick={() => agregarProducto(producto)}>
-            <p>{producto.nombre}</p>
-            <span>{formatNumber(producto.precio_unitario)}</span>
-          </ProductosAdd>
-        ))}
-      </DivDerecho>
-    </DivContenedor>
+        <DivDerecho className="productos">
+          {productos.map((producto, i) => (
+            <ProductosAdd key={i} onClick={() => agregarProducto(producto)}>
+              <p style={{ textAlign: "center", fontWeight: "bold" }}>
+                {producto.nombre}
+              </p>
+              <span>{formatNumber(producto.precio_unitario)}</span>
+            </ProductosAdd>
+          ))}
+        </DivDerecho>
+      </DivContenedor>
+    </>
   );
 };
 

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Mesas from "./components/Mesas";
 import Menu from "./components/menu";
 import Ventas from "./components/Ventas";
+import Inventario from "./components/Inventario";
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
           <Route path="/" element={<Mesas />} />
           <Route path="/Mesas" element={<Mesas />} />
           <Route path="/Ventas" element={<Ventas />} />
-          <Route path="/Inventario" element={<div></div>} />
+          <Route path="/Inventario" element={<Inventario />} />
         </Routes>
       </Router>
     </>
