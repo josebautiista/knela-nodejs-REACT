@@ -71,7 +71,7 @@ export default function Menu() {
     <div>
       <React.Fragment key="left">
         <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static" sx={{ background: "#5b5b5b" }}>
+          <AppBar position="fixed" sx={{ background: "#5b5b5b" }}>
             <Toolbar>
               <IconButton
                 size="large"
@@ -98,6 +98,8 @@ export default function Menu() {
           {list("left")}
         </Drawer>
       </React.Fragment>
+      {/* Agrega el margen superior al contenido para evitar que se solape con la barra de navegación */}
+      <Box sx={{ marginTop: "64px" }}>{/* Contenido de tu página aquí */}</Box>
     </div>
   );
 }

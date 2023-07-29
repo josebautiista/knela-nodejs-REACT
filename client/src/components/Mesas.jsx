@@ -10,7 +10,7 @@ const StyledBox = styled(Box)`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  margin: 20px 0px;
+  margin-top: 100px;
 
   & > :not(style) {
     width: 250px;

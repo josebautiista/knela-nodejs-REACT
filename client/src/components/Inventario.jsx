@@ -26,7 +26,7 @@ export default function Inventario() {
   }, []);
 
   return (
-    <div style={{ boxSizing: "border-box", padding: "0px 30px" }}>
+    <div style={{ boxSizing: "border-box", padding: "10px 30px 30px 30px" }}>
       <Typography variant="h4" sx={{ margin: "20px" }}>
         Inventario
       </Typography>

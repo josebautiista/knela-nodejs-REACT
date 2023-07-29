@@ -36,9 +36,6 @@ export default function Ventas() {
         // Filtrar las ventas duplicadas por su venta_id
         const uniqueVentas = getUniqueVentas(response.data, "venta_id");
         setVentas(uniqueVentas);
-
-        // Mostrar todas las ventas al cargar el componente
-        handleFilterVentas();
       })
       .catch((error) => {
         console.error("Error al obtener los datos de ventas:", error);
