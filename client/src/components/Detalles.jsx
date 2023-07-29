@@ -102,6 +102,9 @@ const DivDerecho = styled.div`
   padding: 10px;
   border-radius: 5px;
   overflow-y: scroll;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 `;
 
 const ProductosAdd = styled(Paper)`
@@ -109,6 +112,7 @@ const ProductosAdd = styled(Paper)`
   height: 130px;
   display: flex;
   justify-content: center;
+  flex-direction: column;
   align-items: center;
   cursor: pointer;
   font-weight: bold;
@@ -216,7 +220,14 @@ export const Detalles = ({
   };
 
   const formatNumber = (number) => {
-    return number.toLocaleString();
+    const optionsCOP = {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+      useGrouping: true,
+    };
+    return number.toLocaleString("es-CO", optionsCOP);
   };
 
   return (
@@ -299,7 +310,7 @@ export const Detalles = ({
             }}
           >
             <div>
-              Total: ${" "}
+              Total:{" "}
               {formatNumber(
                 addProducto
                   .map(
@@ -334,7 +345,8 @@ export const Detalles = ({
       <DivDerecho className="productos">
         {productos.map((producto, i) => (
           <ProductosAdd key={i} onClick={() => agregarProducto(producto)}>
-            {producto.nombre}
+            <p>{producto.nombre}</p>
+            <span>{formatNumber(producto.precio_unitario)}</span>
           </ProductosAdd>
         ))}
       </DivDerecho>

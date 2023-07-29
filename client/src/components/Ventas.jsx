@@ -55,7 +55,6 @@ export default function Ventas() {
       .get(`http://localhost:3000/detalles_venta?venta_id=${venta.venta_id}`)
       .then((response) => {
         setDetalleVentas(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error al obtener los detalles de la venta:", error);

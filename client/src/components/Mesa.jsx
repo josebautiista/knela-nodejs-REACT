@@ -38,27 +38,31 @@ export default function Mesa({ id }) {
     eliminarProductosDeMesa()
       .then(() => {
         // Después de eliminar los productos, agregar los nuevos al carrito
-        addProducto.forEach((producto) => {
-          console.log(producto);
-          const carritoData = {
-            mesa_id: id,
-            producto_id: producto.producto_id,
-            cantidad: producto.cantidad,
-            precio_venta: producto.precio_venta,
-          };
-
-          axios
-            .post("http://localhost:3000/carrito_compras", carritoData)
-            .then((response) => {
-              console.log("Producto agregado al carrito:", response.data);
-            })
-            .catch((error) => {
-              console.error("Error al agregar producto al carrito:", error);
-            });
+        return Promise.all(
+          addProducto.map((producto) => {
+            const carritoData = {
+              mesa_id: id,
+              producto_id: producto.producto_id,
+              cantidad: producto.cantidad,
+              precio_venta: producto.precio_venta,
+            };
+            return axios.post(
+              "http://localhost:3000/carrito_compras",
+              carritoData
+            );
+          })
+        );
+      })
+      .then((responses) => {
+        responses.forEach((response) => {
+          console.log("Producto agregado al carrito:", response.data);
         });
       })
       .catch((error) => {
-        console.error("Error al eliminar productos de la mesa:", error);
+        console.error(
+          "Error al eliminar productos de la mesa o agregar al carrito:",
+          error
+        );
       });
   };
 

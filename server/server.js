@@ -21,6 +21,9 @@ app.get("/mesas", (req, res) => {
       console.log(err);
     } else {
       res.send(result);
+      result.forEach((res) => {
+        actualizarEstadoMesa(res.mesa_id);
+      });
     }
   });
 });
@@ -113,9 +116,32 @@ app.delete("/carrito_compras/:mesa_id", (req, res) => {
   });
 });
 
+const actualizarEstadoMesa = (mesa_id) => {
+  const checkProductosQuery =
+    "SELECT COUNT(*) AS count FROM carrito_compras WHERE mesa_id = ?";
+  connection.query(checkProductosQuery, [mesa_id], (error, results) => {
+    if (error) {
+      console.error(
+        "Error al verificar productos en el carrito de compras:",
+        error
+      );
+    } else {
+      const tieneProductos = results[0].count > 0;
+      const nuevoEstado = tieneProductos ? "Ocupada" : "Disponible";
+
+      const updateMesaQuery = "UPDATE Mesas SET estado = ? WHERE mesa_id = ?";
+      connection.query(updateMesaQuery, [nuevoEstado, mesa_id], (error) => {
+        if (error) {
+          console.error("Error al actualizar el estado de la mesa:", error);
+        }
+      });
+    }
+  });
+};
+
 app.post("/carrito_compras", (req, res) => {
   const { mesa_id, producto_id, cantidad, precio_venta } = req.body;
-  if (!mesa_id || !producto_id || !cantidad || precio_venta) {
+  if (!mesa_id || !producto_id || !cantidad || precio_venta === undefined) {
     return res.status(400).json({ error: "Faltan datos requeridos" });
   }
 
@@ -135,17 +161,7 @@ app.post("/carrito_compras", (req, res) => {
         });
       } else {
         // Actualizar el estado de la mesa a "Ocupada" en la tabla "Mesas"
-        const updateMesaQuery =
-          "UPDATE Mesas SET estado = 'Ocupada' WHERE mesa_id = ?";
-        connection.query(updateMesaQuery, [mesa_id], (error) => {
-          if (error) {
-            console.error("Error al actualizar el estado de la mesa:", error);
-          } else {
-            res.status(201).json({
-              message: "Producto agregado al carrito de compras exitosamente.",
-            });
-          }
-        });
+        actualizarEstadoMesa(mesa_id);
       }
     }
   );
@@ -226,13 +242,7 @@ app.post("/ventas", (req, res) => {
           console.error("Error al calcular el total de la venta:", error);
         } else {
           const mesa_id = req.body.mesa_id;
-          const updateMesaQuery =
-            "UPDATE Mesas SET estado = 'Disponible' WHERE mesa_id = ?";
-          connection.query(updateMesaQuery, [mesa_id], (error) => {
-            if (error) {
-              console.error("Error al actualizar el estado de la mesa:", error);
-            }
-          });
+          actualizarEstadoMesa(mesa_id);
         }
       });
 
