@@ -74,11 +74,7 @@ export default function Mesa({ id }) {
     axios
       .get(`http://localhost:3000/carrito_compras/${id}`)
       .then((response) => {
-        const productos = response.data.map((producto) => ({
-          ...producto,
-          precio_venta: producto.precio_unitario,
-        }));
-
+        const productos = response.data;
         setAddProducto(productos);
       })
       .catch((error) => {
@@ -92,7 +88,12 @@ export default function Mesa({ id }) {
 
   return (
     <div>
-      <Button onClick={handleOpen} variant="contained" color="inherit">
+      <Button
+        onClick={handleOpen}
+        variant="contained"
+        color="success"
+        sx={{ color: "black", fontWeight: "bold" }}
+      >
         Detalles
       </Button>
       <Modal open={open} onClose={handleClose}>

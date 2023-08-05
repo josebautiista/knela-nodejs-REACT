@@ -57,14 +57,14 @@ const ProductoCarrito = styled(Paper)`
 `;
 
 const DivCantidad = styled.div`
-  width: 35%;
+  flex-basis: 20%;
   display: flex;
   align-items: center;
   gap: 5px;
 `;
 
 const InputCantidad = styled.input`
-  width: 50px;
+  width: 40px;
   text-align: center;
   background: white;
   outline: none;
@@ -241,13 +241,14 @@ export const Detalles = ({
         <DivIzquierdo>
           <ContainerDetallesProductos className="add-producto">
             <NombreColumnas>
-              <div style={{ flexBasis: "40%" }}>Producto</div>
+              <div style={{ flexBasis: "50%" }}>Producto</div>
               <div style={{ flexBasis: "20%" }}>Cantidad</div>
-              <div style={{ flexBasis: "20%" }}>Valor</div>
+              <div style={{ flexBasis: "20%" }}>Unidad</div>
+              <div style={{ flexBasis: "10%" }}>Valor</div>
             </NombreColumnas>
             {addProducto.map((producto, i) => (
               <ProductoCarrito key={i}>
-                <div style={{ width: "60%" }}>{producto.nombre}</div>
+                <div style={{ flexBasis: "40%" }}>{producto.nombre}</div>
                 <DivCantidad>
                   <RemoveIcon
                     color="error"
@@ -278,9 +279,9 @@ export const Detalles = ({
                 <InputCantidad
                   type="tel"
                   value={
-                    (producto.precio_venta !== undefined
+                    producto.precio_venta !== undefined
                       ? producto.precio_venta
-                      : "") * producto.cantidad
+                      : ""
                   }
                   onChange={(e) => {
                     const nuevoPrecio = parseInt(e.target.value);
@@ -298,6 +299,9 @@ export const Detalles = ({
                     );
                   }}
                 />
+                <p style={{ flexBasis: "10%" }}>
+                  {formatNumber(producto.precio_venta * producto.cantidad || 0)}
+                </p>
               </ProductoCarrito>
             ))}
           </ContainerDetallesProductos>

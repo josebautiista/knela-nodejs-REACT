@@ -18,7 +18,6 @@ export default function Inventario() {
       .get("http://localhost:3000/inventario") // Reemplaza la URL con la ruta de tu API
       .then((response) => {
         setProductos(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error("Error al obtener los datos de productos:", error);

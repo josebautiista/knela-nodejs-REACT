@@ -11,6 +11,7 @@ const StyledBox = styled(Box)`
   flex-wrap: wrap;
   justify-content: center;
   margin-top: 100px;
+  color: "white";
 
   & > :not(style) {
     width: 250px;
@@ -60,7 +61,8 @@ export default function Mesas() {
             elevation={3}
             key={index}
             sx={{
-              backgroundColor: mesa.estado === "Disponible" ? "#10ff74" : "red",
+              backgroundColor:
+                mesa.estado === "Disponible" ? "#4a6f20" : "#7b1104",
             }}
             onClick={handleOpen}
           >

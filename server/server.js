@@ -265,7 +265,6 @@ app.get("/inventario", (req, res) => {
       res.status(500).json({ error: "Error al obtener los productos" });
     } else {
       res.status(200).json(result);
-      console.log(result);
     }
   });
 });
