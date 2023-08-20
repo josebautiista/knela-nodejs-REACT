@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Box, Modal } from "@mui/material";
 import { Detalles } from "./Detalles";
-import axios from "axios";
 import PropTypes from "prop-types";
 
 const style = {
@@ -32,59 +31,7 @@ export default function Mesa({ id }) {
 
   const handleClose = () => {
     setOpen(false);
-    agregarProductosAlCarrito();
   };
-  const agregarProductosAlCarrito = () => {
-    eliminarProductosDeMesa()
-      .then(() => {
-        // Después de eliminar los productos, agregar los nuevos al carrito
-        return Promise.all(
-          addProducto.map((producto) => {
-            const carritoData = {
-              mesa_id: id,
-              producto_id: producto.producto_id,
-              cantidad: producto.cantidad,
-              precio_venta: producto.precio_venta,
-            };
-            return axios.post(
-              "http://localhost:3000/carrito_compras",
-              carritoData
-            );
-          })
-        );
-      })
-      .then((responses) => {
-        responses.forEach((response) => {
-          console.log("Producto agregado al carrito:", response.data);
-        });
-      })
-      .catch((error) => {
-        console.error(
-          "Error al eliminar productos de la mesa o agregar al carrito:",
-          error
-        );
-      });
-  };
-
-  const eliminarProductosDeMesa = () => {
-    return axios.delete(`http://localhost:3000/carrito_compras/${id}`);
-  };
-
-  const obtenerProductosEnCarrito = useCallback(() => {
-    axios
-      .get(`http://localhost:3000/carrito_compras/${id}`)
-      .then((response) => {
-        const productos = response.data;
-        setAddProducto(productos);
-      })
-      .catch((error) => {
-        console.error("Error al obtener productos en carrito:", error);
-      });
-  }, [id]);
-
-  useEffect(() => {
-    obtenerProductosEnCarrito();
-  }, [id, obtenerProductosEnCarrito]);
 
   return (
     <div>
@@ -103,7 +50,6 @@ export default function Mesa({ id }) {
               idMesa={id}
               addProducto={addProducto}
               setAddProducto={setAddProducto}
-              eliminarProductosDeMesa={eliminarProductosDeMesa}
             />
           )}
         </Box>
