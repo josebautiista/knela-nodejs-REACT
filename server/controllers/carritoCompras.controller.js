@@ -241,3 +241,23 @@ exports.vaciarCarrito = (req, res) => {
     }
   });
 };
+
+exports.cambiarMesa = (req, res) => {
+  const { mesaActual, nuevaMesa } = req.params;
+
+  const updateQuery =
+    "UPDATE carrito_compras SET mesa_id = ? WHERE mesa_id = ?";
+
+  connection.query(updateQuery, [nuevaMesa, mesaActual], (error, results) => {
+    if (error) {
+      console.error("Error al cambiar la mesa de los productos:", error);
+      res.status(500).json({
+        error: "Error al cambiar la mesa de los productos",
+      });
+    } else {
+      res.status(200).json({
+        message: `${results.affectedRows} productos cambiados de mesa exitosamente`,
+      });
+    }
+  });
+};

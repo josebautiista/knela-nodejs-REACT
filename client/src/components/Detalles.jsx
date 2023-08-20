@@ -1,4 +1,16 @@
-import { Button, Paper, Typography } from "@mui/material";
+import {
+  Button,
+  Paper,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
@@ -130,6 +142,47 @@ export const Detalles = ({ idMesa }) => {
   const [productos, setProductos] = useState([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
   const [nuevo, setNuevo] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [newTable, setNewTable] = useState("");
+  const [tableOptions, setTableOptions] = useState([]);
+  const [selectedTable, setSelectedTable] = useState(idMesa);
+
+  useEffect(() => {
+    // Fetch table options from the API
+    axios
+      .get("http://localhost:3000/mesas")
+      .then((response) => {
+        setTableOptions(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching table options:", error);
+      });
+  }, []);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleConfirm = () => {
+    if (newTable) {
+      axios
+        .put(
+          `http://localhost:3000/carrito_compras/cambiar_mesa/${selectedTable}/${newTable}`
+        )
+        .then((response) => {
+          console.log("Products transferred successfully:", response.data);
+          setSelectedTable(newTable); // Actualizar la mesa seleccionada
+          handleClose();
+        })
+        .catch((error) => {
+          console.error("Error transferring products:", error);
+        });
+    }
+  };
 
   //traer todas las categorias de la API
   useEffect(() => {
@@ -170,7 +223,7 @@ export const Detalles = ({ idMesa }) => {
 
   const obtenerProductosEnCarrito = useCallback(() => {
     axios
-      .get(`http://localhost:3000/carrito_compras/${idMesa}`)
+      .get(`http://localhost:3000/carrito_compras/${selectedTable}`)
       .then((response) => {
         const productos = response.data.filter(
           (producto) => producto.cantidad > 0
@@ -180,7 +233,7 @@ export const Detalles = ({ idMesa }) => {
       .catch((error) => {
         console.error("Error al obtener productos en carrito:", error);
       });
-  }, [idMesa]);
+  }, [selectedTable]);
 
   useEffect(() => {
     obtenerProductosEnCarrito();
@@ -190,7 +243,7 @@ export const Detalles = ({ idMesa }) => {
     // Realizar una solicitud GET a la API para obtener el producto en el carrito actual de la mesa
     axios
       .get(
-        `http://localhost:3000/carrito_compras/existe/${idMesa}/${producto.producto_id}`
+        `http://localhost:3000/carrito_compras/existe/${selectedTable}/${producto.producto_id}`
       )
       .then((response) => {
         const productoEnCarrito = response.data;
@@ -202,7 +255,7 @@ export const Detalles = ({ idMesa }) => {
           console.log(nuevaCantidad);
           axios
             .put(
-              `http://localhost:3000/carrito_compras/${idMesa}/${producto.producto_id}/actualizar_cantidad`,
+              `http://localhost:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
               {
                 ...productoEnCarrito,
                 cantidad: nuevaCantidad,
@@ -230,7 +283,7 @@ export const Detalles = ({ idMesa }) => {
           axios
             .post("http://localhost:3000/carrito_compras", {
               ...producto,
-              mesa_id: idMesa,
+              mesa_id: selectedTable,
               cantidad: 1,
             })
             .then(() => {
@@ -254,7 +307,7 @@ export const Detalles = ({ idMesa }) => {
   const eliminarProductoCarrito = (productoId) => {
     axios
       .delete(
-        `http://localhost:3000/carrito_compras/existe/${idMesa}/${productoId}`
+        `http://localhost:3000/carrito_compras/existe/${selectedTable}/${productoId}`
       )
       .then(() => {
         // Actualizar el estado local eliminando el producto con productoId
@@ -278,7 +331,7 @@ export const Detalles = ({ idMesa }) => {
       // Si la cantidad es mayor a 0, actualizar la cantidad en el carrito mediante una solicitud PUT a la API
       axios
         .put(
-          `http://localhost:3000/add_carrito_compras/${idMesa}/${producto.producto_id}`,
+          `http://localhost:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
           {
             cantidad: nuevaCantidad,
           }
@@ -308,7 +361,7 @@ export const Detalles = ({ idMesa }) => {
     if (nuevaCantidad !== null) {
       axios
         .put(
-          `http://localhost:3000/carrito_compras/${idMesa}/${producto.producto_id}/actualizar_cantidad`,
+          `http://localhost:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
           {
             cantidad: nuevaCantidad,
           }
@@ -338,7 +391,7 @@ export const Detalles = ({ idMesa }) => {
     if (nuevoPrecio !== null) {
       axios
         .put(
-          `http://localhost:3000/carrito_compras/${idMesa}/${producto.producto_id}/actualizar_precio`,
+          `http://localhost:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_precio`,
           {
             precio_venta: precio,
           }
@@ -373,14 +426,14 @@ export const Detalles = ({ idMesa }) => {
         precio_venta: producto.precio_venta,
         valor_total: producto.precio_venta * producto.cantidad,
       })),
-      mesa_id: idMesa,
+      mesa_id: selectedTable,
     };
 
     axios
       .post("http://localhost:3000/ventas", nuevaVenta)
       .then(() => {
         axios
-          .delete(`http://localhost:3000/carrito_compras/${idMesa}`)
+          .delete(`http://localhost:3000/carrito_compras/${selectedTable}`)
           .then(() => {
             console.log("Carrito vaciado correctamente en el backend.");
             setNuevo([]); // Vaciar el estado local de productos en el carrito
@@ -408,12 +461,48 @@ export const Detalles = ({ idMesa }) => {
 
   return (
     <>
-      <Typography
-        variant="h4"
-        sx={{ textAlign: "center", marginBottom: "20px" }}
-      >
-        Mesa {idMesa}
-      </Typography>
+      <div style={{ textAlign: "center", marginBottom: "10px" }}>
+        <Typography
+          variant="h4"
+          sx={{ textAlign: "center", marginBottom: "20px" }}
+        >
+          Mesa {selectedTable}
+        </Typography>
+        <Button variant="contained" color="success" onClick={handleClickOpen}>
+          Cambiar mesa
+        </Button>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Cambiar mesa</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Seleccione a qué mesa desea cambiar:
+            </DialogContentText>
+            <FormControl fullWidth>
+              <Select
+                labelId="newTable-label"
+                id="newTable"
+                value={newTable}
+                onChange={(e) => setNewTable(e.target.value)}
+                autoFocus
+              >
+                {tableOptions.map((table) => (
+                  <MenuItem key={table.mesa_id} value={table.mesa_id}>
+                    Mesa {table.mesa_id}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancelar
+            </Button>
+            <Button onClick={handleConfirm} color="primary">
+              Confirmar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
       <DivContenedor>
         <DivIzquierdo>
           <ContainerDetallesProductos className="add-producto">

@@ -27,4 +27,9 @@ router.delete(
 
 router.delete("/:mesa_id", carritoComprasController.vaciarCarrito);
 
+router.put(
+  "/cambiar_mesa/:mesaActual/:nuevaMesa",
+  carritoComprasController.cambiarMesa
+);
+
 module.exports = router;
