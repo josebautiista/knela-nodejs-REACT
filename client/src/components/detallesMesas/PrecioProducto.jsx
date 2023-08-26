@@ -69,9 +69,7 @@ PrecioProducto.propTypes = {
   producto: PropTypes.shape({
     producto_id: PropTypes.number.isRequired,
     nombre: PropTypes.string.isRequired,
-    precio_venta: PropTypes.number, // El precio no es requerido
-    // Otras propiedades si las hay
+    precio_venta: PropTypes.number,
   }).isRequired,
-  InputCantidad: PropTypes.elementType.isRequired,
   selectedTable: PropTypes.number.isRequired,
 };

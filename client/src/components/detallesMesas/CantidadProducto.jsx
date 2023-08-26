@@ -94,6 +94,5 @@ CantidadProducto.propTypes = {
     nombre: PropTypes.string.isRequired,
     cantidad: PropTypes.number.isRequired,
   }).isRequired,
-  InputCantidad: PropTypes.elementType.isRequired,
   agregarProducto: PropTypes.func.isRequired,
 };

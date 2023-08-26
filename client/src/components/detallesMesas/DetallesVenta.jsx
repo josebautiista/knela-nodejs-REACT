@@ -3,12 +3,15 @@ import { Paper } from "@mui/material";
 import PropTypes from "prop-types";
 import CantidadProducto from "./CantidadProducto";
 import PrecioProducto from "./PrecioProducto";
+import { useEffect } from "react";
 
 const ContainerDetallesProductos = styled.div`
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
   gap: 5px;
+  box-sizing: border-box;
+  padding: 5px;
 `;
 
 const NombreColumnas = styled(Paper)`
@@ -46,36 +49,44 @@ export default function DetallesVenta({
   agregarProducto,
   formatNumber,
 }) {
+  useEffect(() => {
+    const container = document.querySelector(".add-producto");
+    if (container) {
+      container.scrollTop = container.scrollHeight; // Desplaza el contenedor hacia abajo
+    }
+  }, [nuevo]);
   return (
-    <ContainerDetallesProductos className="add-producto">
+    <>
       <NombreColumnas>
         <div style={{ flexBasis: "50%" }}>Producto</div>
         <div style={{ flexBasis: "30%" }}>Cantidad</div>
         <div style={{ flexBasis: "28%" }}>Unidad</div>
         <div style={{ flexBasis: "18%" }}>Valor</div>
       </NombreColumnas>
-      {nuevo.map((producto, i) => (
-        <ProductoCarrito key={i}>
-          <div style={{ width: "40%" }}>{producto.nombre}</div>
-          <CantidadProducto
-            selectedTable={selectedTable}
-            setNuevo={setNuevo}
-            producto={producto}
-            agregarProducto={agregarProducto}
-          ></CantidadProducto>
+      <ContainerDetallesProductos className="add-producto">
+        {nuevo.map((producto, i) => (
+          <ProductoCarrito key={i}>
+            <div style={{ width: "40%" }}>{producto.nombre}</div>
+            <CantidadProducto
+              selectedTable={selectedTable}
+              setNuevo={setNuevo}
+              producto={producto}
+              agregarProducto={agregarProducto}
+            ></CantidadProducto>
 
-          <PrecioProducto
-            producto={producto}
-            setNuevo={setNuevo}
-            selectedTable={selectedTable}
-          ></PrecioProducto>
+            <PrecioProducto
+              producto={producto}
+              setNuevo={setNuevo}
+              selectedTable={selectedTable}
+            ></PrecioProducto>
 
-          <p style={{ width: "20%" }}>
-            {formatNumber(producto.precio_venta * producto.cantidad || 0)}
-          </p>
-        </ProductoCarrito>
-      ))}
-    </ContainerDetallesProductos>
+            <p style={{ width: "20%" }}>
+              {formatNumber(producto.precio_venta * producto.cantidad || 0)}
+            </p>
+          </ProductoCarrito>
+        ))}
+      </ContainerDetallesProductos>
+    </>
   );
 }
 DetallesVenta.propTypes = {

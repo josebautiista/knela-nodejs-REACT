@@ -19,8 +19,8 @@ const DivDerecho = styled.div`
 `;
 
 const ProductosAdd = styled(Paper)`
-  width: 130px;
-  height: 130px;
+  width: 126px;
+  height: 126px;
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -72,5 +72,5 @@ export default function Derecho({
 Derecho.propTypes = {
   formatNumber: PropTypes.func.isRequired,
   agregarProducto: PropTypes.func.isRequired,
-  categoriaSeleccionada: PropTypes.number.isRequired,
+  categoriaSeleccionada: PropTypes.any,
 };
