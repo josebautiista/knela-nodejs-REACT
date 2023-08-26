@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Box, Modal } from "@mui/material";
-import { Detalles } from "./Detalles";
+import { Detalles } from "./detallesMesas/Detalles";
 import PropTypes from "prop-types";
 
 const style = {
