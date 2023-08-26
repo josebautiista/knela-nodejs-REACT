@@ -11,6 +11,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+import TextField from "@mui/material/TextField";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
@@ -146,6 +147,15 @@ export const Detalles = ({ idMesa }) => {
   const [newTable, setNewTable] = useState("");
   const [tableOptions, setTableOptions] = useState([]);
   const [selectedTable, setSelectedTable] = useState(idMesa);
+
+  const total = nuevo
+    .map(
+      (producto) =>
+        (producto.precio_venta !== undefined
+          ? producto.precio_venta
+          : producto.precio_unitario) * producto.cantidad
+    )
+    .reduce((total, valor) => total + valor, 0);
 
   useEffect(() => {
     // Fetch table options from the API
@@ -425,6 +435,8 @@ export const Detalles = ({ idMesa }) => {
         cantidad: producto.cantidad,
         precio_venta: producto.precio_venta,
         valor_total: producto.precio_venta * producto.cantidad,
+        medio_pago_id: selectedMedioPago,
+        cantidad_pago: parseFloat(montoPagado.replace(/\./g, "")), // Cambia a cantidad_pagado en lugar de montoPagado
       })),
       mesa_id: selectedTable,
     };
@@ -459,6 +471,36 @@ export const Detalles = ({ idMesa }) => {
     return number.toLocaleString("es-CO", optionsCOP);
   };
 
+  const [selectedMedioPago, setSelectedMedioPago] = useState("");
+  const [mediosDePago, setMediosDePago] = useState([]);
+  const [montoPagado, setMontoPagado] = useState("");
+  const [medioPagoValido, setMedioPagoValido] = useState(false);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/medios_de_pago")
+      .then((response) => {
+        setMediosDePago(response.data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los medios de pago:", error);
+      });
+  }, []);
+
+  const handleMedioPagoChange = (event) => {
+    setSelectedMedioPago(event.target.value);
+    setMedioPagoValido(event.target.value !== ""); // Actualiza la validez del medio de pago
+  };
+
+  const handleMontoPagadoChange = (event) => {
+    const value = event.target.value;
+    const formattedValue = value
+      .replace(/\D/g, "")
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    setMontoPagado(formattedValue);
+  };
+  const diferencia =
+    montoPagado !== "" ? parseFloat(montoPagado.replace(/\./g, "")) - total : 0;
   return (
     <>
       <div style={{ textAlign: "center", marginBottom: "10px" }}>
@@ -574,43 +616,86 @@ export const Detalles = ({ idMesa }) => {
               </ProductoCarrito>
             ))}
           </ContainerDetallesProductos>
-          <div>
-            <Paper
+
+          <Paper
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "20px",
+            }}
+          >
+            <div
               style={{
-                width: "100%",
-                height: "150px",
+                width: "60%",
                 display: "flex",
-                justifyContent: "space-around",
-                alignItems: "flex-end",
                 flexDirection: "column",
-                boxSizing: "border-box",
-                padding: "10px",
-                fontSize: "2rem",
+                alignItems: "flex-start",
+                fontSize: "1.5rem",
               }}
             >
-              <div>
-                Total:{" "}
-                {formatNumber(
-                  nuevo
-                    .map(
-                      (producto) =>
-                        (producto.precio_venta !== undefined
-                          ? producto.precio_venta
-                          : producto.precio_unitario) * producto.cantidad
-                    )
-                    .reduce((total, valor) => total + valor, 0)
-                )}
+              <div
+                style={{
+                  marginBottom: "10px",
+                  fontWeight: "bold",
+                  fontSize: "1.7rem",
+                }}
+              >
+                Total a Pagar
               </div>
+              <div
+                style={{
+                  fontSize: "2.5rem",
+                  color: "green",
+                }}
+              >
+                {formatNumber(total)}
+              </div>
+              <div
+                style={{
+                  marginTop: "10px",
+                  fontSize: "1.7rem",
+                }}
+              >
+                Cambio: {diferencia > 0 ? formatNumber(diferencia) : 0}
+              </div>
+            </div>
+
+            <div
+              style={{ width: "40%", display: "flex", flexDirection: "column" }}
+            >
+              <TextField
+                select
+                label="Medio de Pago"
+                value={selectedMedioPago}
+                onChange={handleMedioPagoChange}
+                style={{ marginBottom: "10px" }}
+              >
+                {mediosDePago.map((medio) => (
+                  <MenuItem key={medio.id} value={medio.id}>
+                    {medio.nombre}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                label="Monto Pagado"
+                value={montoPagado}
+                onChange={handleMontoPagadoChange}
+                type="text"
+                style={{ marginBottom: "10px" }}
+              />
               <Button
                 color="success"
                 size="large"
                 variant="contained"
                 onClick={registrarVenta}
+                disabled={!medioPagoValido} // Deshabilita el botón si el medio de pago no es válido
               >
                 Cobrar
               </Button>
-            </Paper>
-          </div>
+            </div>
+          </Paper>
         </DivIzquierdo>
 
         <DivCentro>

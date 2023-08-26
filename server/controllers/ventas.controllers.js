@@ -18,31 +18,50 @@ exports.getVentas = (req, res) => {
 };
 
 exports.crearVenta = (req, res) => {
-  const { cliente_id, detalles, mesa_id } = req.body;
+  const { cliente_id, detalles, mesa_id, medio_pago_id, cantidad_pago } =
+    req.body;
+
+  let ventaExitosa = true; // Variable para rastrear el éxito de la venta
 
   const insertVentaQuery =
     "INSERT INTO Ventas (cliente_id, fecha_hora, total) VALUES (?, NOW(), 0)";
+
   connection.query(insertVentaQuery, [cliente_id], (error, result) => {
     if (error) {
       console.error("Error al insertar la venta:", error);
-      res.status(500).json({ error: "Error al insertar la venta" });
+      ventaExitosa = false; // Marcar la venta como no exitosa
     } else {
       const venta_id = result.insertId;
 
       const insertDetallesQuery =
-        "INSERT INTO Detalles_Venta (venta_id, producto_id, cantidad, precio_venta, valor_total) VALUES (?, ?, ?, ?, ?)";
+        "INSERT INTO Detalles_Venta (venta_id, producto_id, cantidad, precio_venta, valor_total, medio_pago_id, cantidad_pago) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
       detalles.forEach((detalle) => {
-        const { producto_id, cantidad, precio_venta } = detalle;
-        const valor_total = precio_venta * cantidad;
-        connection.query(
-          insertDetallesQuery,
-          [venta_id, producto_id, cantidad, precio_venta, valor_total],
-          (error) => {
-            if (error) {
-              console.error("Error al insertar detalle de venta:", error);
-            }
+        const {
+          producto_id,
+          cantidad,
+          precio_venta,
+          valor_total,
+          medio_pago_id,
+          cantidad_pago,
+        } = detalle;
+
+        const values = [
+          venta_id,
+          producto_id,
+          cantidad,
+          precio_venta,
+          valor_total,
+          medio_pago_id,
+          cantidad_pago,
+        ];
+
+        connection.query(insertDetallesQuery, values, (error) => {
+          if (error) {
+            console.error("Error al insertar detalle de venta:", error);
+            ventaExitosa = false; // Marcar la venta como no exitosa
           }
-        );
+        });
       });
 
       const updateVentaQuery =
@@ -50,12 +69,17 @@ exports.crearVenta = (req, res) => {
       connection.query(updateVentaQuery, [venta_id, venta_id], (error) => {
         if (error) {
           console.error("Error al calcular el total de la venta:", error);
+          ventaExitosa = false; // Marcar la venta como no exitosa
         } else {
           actualizarEstadoMesa(mesa_id);
         }
       });
+    }
 
+    if (ventaExitosa) {
       res.status(201).json({ message: "Nueva venta creada con éxito" });
+    } else {
+      res.status(500).json({ error: "Error al realizar la venta" });
     }
   });
 };

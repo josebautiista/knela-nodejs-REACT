@@ -18,6 +18,7 @@ app.use("/productos", require("./routes/productos.routes"));
 app.use("/ventas", require("./routes/ventas.routes"));
 app.use("/detalles_venta", require("./routes/detalles_venta.routes"));
 app.use("/inventario", require("./routes/inventario.routes"));
+app.use("/medios_de_pago", require("./routes/mediosPago.routes"));
 
 // Start server
 app.listen(port, () => {
