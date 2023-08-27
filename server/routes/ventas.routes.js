@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.get("/", ventasController.getVentas);
 router.post("/", ventasController.crearVenta);
+router.get("/fecha", ventasController.getFecha);
 
 module.exports = router;

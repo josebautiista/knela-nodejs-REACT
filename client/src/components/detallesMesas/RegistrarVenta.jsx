@@ -58,6 +58,8 @@ export default function RegistrarVenta({
   };
 
   const registrarVenta = () => {
+    const cantidadPago =
+      montoPagado !== "" ? parseFloat(montoPagado.replace(/\./g, "")) : 0;
     const nuevaVenta = {
       cliente_id: 1,
       detalles: nuevo.map(
@@ -67,10 +69,10 @@ export default function RegistrarVenta({
           cantidad,
           precio_venta,
           valor_total: precio_venta * cantidad,
-          medio_pago_id: selectedMedioPago,
-          cantidad_pago: parseFloat(montoPagado.replace(/\./g, "")),
         })
       ),
+      medio_pago_id: selectedMedioPago,
+      cantidad_pago: cantidadPago,
       mesa_id: selectedTable,
     };
 
@@ -106,6 +108,10 @@ export default function RegistrarVenta({
   const handleCloseSnackbar = () => {
     setIsSnackbarOpen(false);
   };
+
+  const parsedMontoPagado =
+    montoPagado !== "" ? parseFloat(montoPagado.replace(/\./g, "")) : 0;
+  const diferencia = parsedMontoPagado - total;
 
   return (
     <div style={{ width: "40%", display: "flex", flexDirection: "column" }}>
@@ -163,12 +169,10 @@ export default function RegistrarVenta({
         <DialogContent>
           <h1>Total: {formatNumber(total)}</h1>
           <h2>
-            Recibido: {formatNumber(parseFloat(montoPagado.replace(/\./g, "")))}
+            Recibido:{" "}
+            {formatNumber(parseFloat(montoPagado.replace(/\./g, "")) || 0)}
           </h2>
-          <h3>
-            Cambio:{" "}
-            {formatNumber(parseFloat(montoPagado.replace(/\./g, "")) - total)}
-          </h3>
+          <h3>Cambio: {formatNumber(diferencia > 0 ? diferencia : 0)}</h3>
         </DialogContent>
         <DialogActions>
           <Button

@@ -26,9 +26,9 @@ const TotalPagarContainer = styled.div`
 `;
 
 export default function TotalPagar({ total, formatNumber, montoPagado }) {
-  const diferencia =
-    montoPagado !== "" ? parseFloat(montoPagado.replace(/\./g, "")) - total : 0;
-
+  const parsedMontoPagado =
+    montoPagado !== "" ? parseFloat(montoPagado.replace(/\./g, "")) : 0;
+  const diferencia = parsedMontoPagado - total;
   return (
     <TotalPagarContainer>
       <div>Total a Pagar</div>
