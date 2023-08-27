@@ -67,6 +67,9 @@ exports.crearVenta = (req, res) => {
             console.error("Error al calcular el total de la venta:", error);
             ventaExitosa = false; // Marcar la venta como no exitosa
           } else {
+            detalles.forEach((detalle) => {
+              actualizarCantidadesIngredientes(detalle);
+            });
             actualizarEstadoMesa(mesa_id);
           }
         });
@@ -80,6 +83,49 @@ exports.crearVenta = (req, res) => {
     }
   );
 };
+
+function actualizarCantidadesIngredientes(detalle) {
+  const productoId = detalle.producto_id;
+
+  const selectIngredientesQuery = `
+    SELECT ingrediente_id, cantidad_ingrediente 
+    FROM producto_ingrediente 
+    WHERE producto_id = ?`;
+
+  connection.query(
+    selectIngredientesQuery,
+    [productoId],
+    (err, ingredientes) => {
+      if (err) {
+        console.error("Error al obtener los ingredientes del producto:", err);
+      } else {
+        ingredientes.forEach((ingrediente) => {
+          const ingredienteId = ingrediente.ingrediente_id;
+          const cantidadRestar =
+            ingrediente.cantidad_ingrediente * detalle.cantidad;
+
+          const restarCantidadQuery = `
+          UPDATE ingredientes
+          SET cantidad = cantidad - ?
+          WHERE ingrediente_id = ?`;
+
+          connection.query(
+            restarCantidadQuery,
+            [cantidadRestar, ingredienteId],
+            (err) => {
+              if (err) {
+                console.error(
+                  "Error al restar la cantidad del ingrediente:",
+                  err
+                );
+              }
+            }
+          );
+        });
+      }
+    }
+  );
+}
 
 exports.getFecha = (req, res) => {
   const { fecha } = req.query; // Obtenemos la fecha del query parameter
