@@ -63,11 +63,13 @@ const CambiarMesa = ({ setOpen, open, selectedTable, setSelectedTable }) => {
             onChange={(e) => setNewTable(e.target.value)}
             autoFocus
           >
-            {tableOptions.map((table) => (
-              <MenuItem key={table.mesa_id} value={table.mesa_id}>
-                Mesa {table.mesa_id}
-              </MenuItem>
-            ))}
+            {tableOptions
+              .filter((table) => table.estado === "Disponible") // Filtrar las mesas con estado "Disponible"
+              .map((table) => (
+                <MenuItem key={table.mesa_id} value={table.mesa_id}>
+                  Mesa {table.mesa_id}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
       </DialogContent>

@@ -111,3 +111,15 @@ exports.obtenerProductosPorFecha = (req, res) => {
     }
   });
 };
+
+exports.getAllIngredients = (req, res) => {
+  const query = "SELECT * FROM ingredientes";
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al obtener los ingredientes" });
+    } else {
+      res.json(results);
+    }
+  });
+};

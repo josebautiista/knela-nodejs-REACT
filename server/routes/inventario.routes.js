@@ -9,5 +9,6 @@ router.get(
   inventarioController.verificarInventarioPorFecha
 );
 router.get("/fecha/:fecha", inventarioController.obtenerProductosPorFecha);
+router.get("/ingredientes", inventarioController.getAllIngredients);
 
 module.exports = router;

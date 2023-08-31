@@ -41,7 +41,7 @@ export default function Menu() {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {["Mesas", "Inventario", "Ventas"].map((text, index) => (
+        {["Mesas", "Inventario", "Ventas", "Compras"].map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <button
