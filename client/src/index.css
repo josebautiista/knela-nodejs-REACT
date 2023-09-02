@@ -8,6 +8,10 @@
   background-color: #242424;
 }
 
+.catRes::-webkit-scrollbar{
+  display: none;
+}
+
 .MuiPaper-root::-webkit-scrollbar{
   display: none;
 }

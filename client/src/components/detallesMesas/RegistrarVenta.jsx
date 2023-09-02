@@ -12,6 +12,28 @@ import TextField from "@mui/material/TextField";
 import axios from "axios";
 import PropTypes from "prop-types";
 import MuiAlert from "@mui/material/Alert";
+import { localURL } from "../../conexion";
+import { styled } from "styled-components";
+
+const DivContenedor = styled.div`
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @media (max-width: 768px) {
+    width: 80%;
+    gap: 5px;
+  }
+`;
+
+const RTextField = styled(TextField)`
+  margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    /* Estilos para pantallas más pequeñas (móviles) */
+  }
+`;
 
 export default function RegistrarVenta({
   setNuevo,
@@ -30,7 +52,7 @@ export default function RegistrarVenta({
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/medios_de_pago")
+      .get(`http://${localURL}:3000/medios_de_pago`)
       .then((response) => {
         setMediosDePago(response.data);
       })
@@ -77,10 +99,10 @@ export default function RegistrarVenta({
     };
 
     axios
-      .post("http://localhost:3000/ventas", nuevaVenta)
+      .post(`http://${localURL}:3000/ventas`, nuevaVenta)
       .then(() => {
         axios
-          .delete(`http://localhost:3000/carrito_compras/${selectedTable}`)
+          .delete(`http://${localURL}:3000/carrito_compras/${selectedTable}`)
           .then(() => {
             setNuevo([]);
             setSelectedMedioPago("");
@@ -114,20 +136,20 @@ export default function RegistrarVenta({
   const diferencia = parsedMontoPagado - total;
 
   return (
-    <div style={{ width: "40%", display: "flex", flexDirection: "column" }}>
-      <TextField
+    <DivContenedor>
+      <RTextField
         select
         label="Medio de Pago"
         value={selectedMedioPago}
         onChange={handleMedioPagoChange}
-        style={{ marginBottom: "10px" }}
+        size="small"
       >
         {mediosDePago.map(({ id, nombre }) => (
           <MenuItem key={id} value={id}>
             {nombre}
           </MenuItem>
         ))}
-      </TextField>
+      </RTextField>
 
       <TextField
         label="Recibido"
@@ -135,6 +157,7 @@ export default function RegistrarVenta({
         onChange={handleMontoPagadoChange}
         type="text"
         style={{ marginBottom: "10px" }}
+        size="small"
       />
       <Button
         color="success"
@@ -191,7 +214,7 @@ export default function RegistrarVenta({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </DivContenedor>
   );
 }
 

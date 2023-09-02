@@ -12,6 +12,13 @@ const ContainerDetallesProductos = styled.div`
   gap: 5px;
   box-sizing: border-box;
   padding: 5px;
+
+  @media (max-width: 768px) {
+    height: 50%;
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+  }
 `;
 
 const NombreColumnas = styled(Paper)`

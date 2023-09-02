@@ -6,11 +6,19 @@ import styled from "styled-components";
 import Encabezado from "./Encabezado";
 import Izquierdo from "./Izquierdo";
 import Derecho from "./Derecho";
+import { localURL } from "../../conexion";
 
 const DivContenedor = styled.div`
   display: flex;
   gap: 10px;
   height: 80vh;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+  }
 `;
 
 const DivCentro = styled.div`
@@ -24,6 +32,12 @@ const DivCentro = styled.div`
   padding: 10px;
   border-radius: 5px;
   user-select: none;
+  @media (max-width: 768px) {
+    display: none;
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+  }
 `;
 
 const Categorias = styled(Paper)`
@@ -43,7 +57,7 @@ export const Detalles = ({ idMesa }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/categorias")
+      .get(`http://${localURL}:3000/categorias`)
       .then(({ data }) => {
         setCategorias(data);
       })
@@ -58,7 +72,7 @@ export const Detalles = ({ idMesa }) => {
 
   const obtenerProductosEnCarrito = useCallback(() => {
     axios
-      .get(`http://localhost:3000/carrito_compras/${selectedTable}`)
+      .get(`http://${localURL}:3000/carrito_compras/${selectedTable}`)
       .then(({ data }) => {
         const productos = data.filter(({ cantidad }) => cantidad > 0);
         setNuevo(productos);
@@ -76,7 +90,7 @@ export const Detalles = ({ idMesa }) => {
     // Realizar una solicitud GET a la API para obtener el producto en el carrito actual de la mesa
     axios
       .get(
-        `http://localhost:3000/carrito_compras/existe/${selectedTable}/${producto.producto_id}`
+        `http://${localURL}:3000/carrito_compras/existe/${selectedTable}/${producto.producto_id}`
       )
       .then(({ data }) => {
         const productoEnCarrito = data;
@@ -88,7 +102,7 @@ export const Detalles = ({ idMesa }) => {
           console.log(nuevaCantidad);
           axios
             .put(
-              `http://localhost:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
+              `http://${localURL}:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
               {
                 ...productoEnCarrito,
                 cantidad: nuevaCantidad,
@@ -114,7 +128,7 @@ export const Detalles = ({ idMesa }) => {
         } else {
           // Si el producto no existe en el carrito, agregarlo al carrito en la API
           axios
-            .post("http://localhost:3000/carrito_compras", {
+            .post(`http://${localURL}:3000/carrito_compras`, {
               ...producto,
               mesa_id: selectedTable,
               cantidad: 1,
@@ -161,6 +175,9 @@ export const Detalles = ({ idMesa }) => {
           nuevo={nuevo}
           selectedTable={selectedTable}
           formatNumber={formatNumber}
+          categorias={categorias}
+          handleClick={handleClick}
+          categoriaSeleccionada={categoriaSeleccionada}
         ></Izquierdo>
 
         <DivCentro>

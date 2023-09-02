@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Button from "@mui/material/Button";
 import PropTypes from "prop-types";
+import { localURL } from "../../conexion";
 
 export default function Encabezado({ formatNumber, setFilteredVentas }) {
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -27,7 +28,7 @@ export default function Encabezado({ formatNumber, setFilteredVentas }) {
   useEffect(() => {
     // Realizar la solicitud HTTP para obtener los datos de ventas desde la API
     axios
-      .get("http://localhost:3000/ventas")
+      .get(`http://${localURL}:3000/ventas`)
       .then((response) => {
         // Filtrar las ventas duplicadas por su venta_id
         const uniqueVentas = getUniqueVentas(response.data, "venta_id");
@@ -53,7 +54,7 @@ export default function Encabezado({ formatNumber, setFilteredVentas }) {
       const fecha = new Date(selectedDate).toISOString().slice(0, 10);
 
       axios
-        .get(`http://localhost:3000/ventas/fecha?fecha=${fecha}`)
+        .get(`http://${localURL}:3000/ventas/fecha?fecha=${fecha}`)
         .then((response) => {
           const filteredVentas = response.data;
           setFilteredVentas(filteredVentas);

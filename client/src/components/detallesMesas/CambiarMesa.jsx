@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { localURL } from "../../conexion";
 
 const CambiarMesa = ({ setOpen, open, selectedTable, setSelectedTable }) => {
   const [newTable, setNewTable] = useState("");
@@ -21,7 +22,7 @@ const CambiarMesa = ({ setOpen, open, selectedTable, setSelectedTable }) => {
     if (newTable) {
       axios
         .put(
-          `http://localhost:3000/carrito_compras/cambiar_mesa/${selectedTable}/${newTable}`
+          `http://${localURL}:3000/carrito_compras/cambiar_mesa/${selectedTable}/${newTable}`
         )
         .then(() => {
           setSelectedTable(newTable);
@@ -35,7 +36,7 @@ const CambiarMesa = ({ setOpen, open, selectedTable, setSelectedTable }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/mesas")
+      .get(`http://${localURL}:3000/mesas`)
       .then((response) => {
         setTableOptions(response.data);
       })

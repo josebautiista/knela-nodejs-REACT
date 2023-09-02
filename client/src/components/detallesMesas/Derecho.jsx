@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import { Paper } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { localURL } from "../../conexion";
 
 const DivDerecho = styled.div`
   width: 40%;
@@ -16,6 +17,14 @@ const DivDerecho = styled.div`
   flex-wrap: wrap;
   gap: 10px;
   user-select: none;
+  @media (max-width: 768px) {
+    display: none;
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+  }
 `;
 
 const ProductosAdd = styled(Paper)`
@@ -39,7 +48,7 @@ export default function Derecho({
     if (categoriaSeleccionada) {
       axios
         .get(
-          `http://localhost:3000/productos/categoria?id=${categoriaSeleccionada}`
+          `http://${localURL}:3000/productos/categoria?id=${categoriaSeleccionada}`
         )
         .then(({ data }) => {
           const productos = data.map((producto) => ({

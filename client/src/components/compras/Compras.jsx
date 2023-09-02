@@ -11,6 +11,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import axios from "axios";
+import { localURL } from "../../conexion";
 
 function IngredientManagement() {
   const [ingredients, setIngredients] = useState([]);
@@ -25,7 +26,7 @@ function IngredientManagement() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/medios_de_pago")
+      .get(`http://${localURL}:3000/medios_de_pago`)
       .then((response) => {
         setMediosDePago(response.data);
       })
@@ -37,7 +38,7 @@ function IngredientManagement() {
   useEffect(() => {
     // Hacer una solicitud GET al backend para obtener los ingredientes
     axios
-      .get("http://localhost:3000/inventario/ingredientes")
+      .get(`http://${localURL}:3000/inventario/ingredientes`)
       .then((response) => {
         setIngredients(response.data);
         console.log(response.data);
@@ -59,7 +60,7 @@ function IngredientManagement() {
     console.log(compraData);
 
     axios
-      .post("http://localhost:3000/compras", compraData)
+      .post(`http://${localURL}:3000/compras`, compraData)
       .then((response) => {
         console.log("Compra creada:", response.data);
         // Restablecer los estados a sus valores iniciales para limpiar los campos

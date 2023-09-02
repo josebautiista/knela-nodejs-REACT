@@ -7,6 +7,7 @@ import TableCell from "@mui/material/TableCell";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { localURL } from "../../conexion";
 
 export default function TablaVentas({
   setOpenModal,
@@ -21,7 +22,7 @@ export default function TablaVentas({
     setOpenModal(true);
 
     axios
-      .get(`http://localhost:3000/detalles_venta?venta_id=${venta.venta_id}`)
+      .get(`http://${localURL}:3000/detalles_venta?venta_id=${venta.venta_id}`)
       .then((response) => {
         setDetalleVentas(response.data);
         console.log(response.data);

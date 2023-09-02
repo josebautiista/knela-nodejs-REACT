@@ -10,6 +10,9 @@ import Paper from "@mui/material/Paper";
 import { Button, Typography } from "@mui/material";
 import ImportExportIcon from "@mui/icons-material/ImportExport";
 import TextField from "@mui/material/TextField";
+import { localURL } from "../conexion";
+
+localURL;
 
 export default function Inventario() {
   const [productos, setProductos] = useState([]);
@@ -33,7 +36,7 @@ export default function Inventario() {
   useEffect(() => {
     // Realizar la solicitud HTTP para obtener los datos de productos desde la API
     axios
-      .get("http://localhost:3000/inventario") // Reemplaza la URL con la ruta de tu API
+      .get(`http://${localURL}:3000/inventario`) // Reemplaza la URL con la ruta de tu API
       .then((response) => {
         setProductos(response.data);
       })
@@ -61,14 +64,14 @@ export default function Inventario() {
     const fechaColombia = obtenerFechaColombia();
     axios
       .get(
-        `http://localhost:3000/inventario/verificar-inventario/${fechaColombia}`
+        `http://${localURL}:3000/inventario/verificar-inventario/${fechaColombia}`
       )
       .then((response) => {
         const inventarioExistente = response.data.inventarioExistente;
         if (!inventarioExistente) {
           // Crear un nuevo inventario si no existe
           axios
-            .post("http://localhost:3000/inventario", {})
+            .post(`http://${localURL}:3000/inventario`, {})
             .then(() => {
               console.log("Inventario creado exitosamente.");
             })
@@ -107,7 +110,7 @@ export default function Inventario() {
   const handleFilterInventario = () => {
     if (selectedDate) {
       axios
-        .get(`http://localhost:3000/inventario/fecha/${selectedDate}`)
+        .get(`http://${localURL}:3000/inventario/fecha/${selectedDate}`)
         .then((response) => {
           setProductos(response.data);
         })
@@ -117,7 +120,7 @@ export default function Inventario() {
     } else {
       // Si no hay una fecha seleccionada, muestra todos los inventarios
       axios
-        .get("http://localhost:3000/inventario")
+        .get(`http://${localURL}:3000/inventario`)
         .then((response) => {
           setProductos(response.data);
         })

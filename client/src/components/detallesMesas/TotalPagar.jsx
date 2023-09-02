@@ -7,21 +7,35 @@ const TotalPagarContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
   font-size: 1.5rem;
-
-  & > div:nth-child(1) {
-    margin-bottom: 10px;
-    font-weight: bold;
-    font-size: 1.7rem;
+  @media (max-width: 768px) {
   }
+`;
 
-  & > div:nth-child(2) {
-    font-size: 2.5rem;
-    color: green;
+const TotalContainer = styled.div`
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.7rem;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin-bottom: 0px;
   }
+`;
 
-  & > div:nth-child(3) {
-    margin-top: 10px;
-    font-size: 1.7rem;
+const TotalLabel = styled.div`
+  font-size: 2.5rem;
+  color: green;
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+`;
+
+const TotalValue = styled.div`
+  margin-top: 10px;
+  font-size: 1.7rem;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin-top: 0px;
   }
 `;
 
@@ -31,9 +45,11 @@ export default function TotalPagar({ total, formatNumber, montoPagado }) {
   const diferencia = parsedMontoPagado - total;
   return (
     <TotalPagarContainer>
-      <div>Total a Pagar</div>
-      <div>{formatNumber(total)}</div>
-      <div>Cambio: {diferencia > 0 ? formatNumber(diferencia) : 0}</div>
+      <TotalContainer>Total a Pagar</TotalContainer>
+      <TotalLabel>{formatNumber(total)}</TotalLabel>
+      <TotalValue>
+        Cambio: {diferencia > 0 ? formatNumber(diferencia) : 0}
+      </TotalValue>
     </TotalPagarContainer>
   );
 }

@@ -1,6 +1,7 @@
 import axios from "axios";
 import PropTypes from "prop-types";
 import { styled } from "styled-components";
+import { localURL } from "../../conexion";
 
 const InputPrecio = styled.input`
   width: 15%;
@@ -18,7 +19,7 @@ export default function PrecioProducto({ selectedTable, setNuevo, producto }) {
     if (nuevoPrecio !== null) {
       axios
         .put(
-          `http://localhost:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_precio`,
+          `http://${localURL}:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_precio`,
           {
             precio_venta: precio,
           }

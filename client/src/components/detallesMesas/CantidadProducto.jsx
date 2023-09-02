@@ -3,6 +3,7 @@ import axios from "axios";
 import { styled } from "styled-components";
 import PropTypes from "prop-types";
 import RestarCantidad from "./RestarCantidad";
+import { localURL } from "../../conexion";
 
 const DivCantidad = styled.div`
   width: 30%;
@@ -32,7 +33,7 @@ export default function CantidadProducto({
     if (nuevaCantidad !== null) {
       axios
         .put(
-          `http://localhost:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
+          `http://${localURL}:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
           {
             cantidad: nuevaCantidad,
           }

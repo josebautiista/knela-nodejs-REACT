@@ -1,12 +1,13 @@
 import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { localURL } from "../../conexion";
 
 export default function RestarCantidad({ producto, setNuevo, selectedTable }) {
   const eliminarProductoCarrito = (productoId) => {
     axios
       .delete(
-        `http://localhost:3000/carrito_compras/existe/${selectedTable}/${productoId}`
+        `http://${localURL}:3000/carrito_compras/existe/${selectedTable}/${productoId}`
       )
       .then(() => {
         // Actualizar el estado local eliminando el producto con productoId
@@ -28,7 +29,7 @@ export default function RestarCantidad({ producto, setNuevo, selectedTable }) {
       // Si la cantidad es mayor a 0, actualizar la cantidad en el carrito mediante una solicitud PUT a la API
       axios
         .put(
-          `http://localhost:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
+          `http://${localURL}:3000/carrito_compras/${selectedTable}/${producto.producto_id}/actualizar_cantidad`,
           {
             cantidad: nuevaCantidad,
           }

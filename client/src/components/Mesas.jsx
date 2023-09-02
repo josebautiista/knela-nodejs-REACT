@@ -11,6 +11,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import Button from "@mui/material/Button";
+import { localURL } from "../conexion";
 
 const StyledBox = styled(Box)`
   display: flex;
@@ -51,7 +52,7 @@ export default function Mesas() {
     setDialogOpen(true);
   };
   const confirmarAñadirMesa = () => {
-    Axios.post("http://localhost:3000/mesas", {
+    Axios.post(`http://${localURL}:3000/mesas`, {
       capacidad: 4,
       estado: "Disponible",
     })
@@ -68,7 +69,7 @@ export default function Mesas() {
   useEffect(() => {
     // Función para obtener las mesas desde el servidor
     const getMesas = () => {
-      Axios.get("http://localhost:3000/mesas").then((response) => {
+      Axios.get(`http://${localURL}:3000/mesas`).then((response) => {
         setMesas(response.data);
       });
     };
