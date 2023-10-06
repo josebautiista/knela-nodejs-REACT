@@ -5,6 +5,7 @@ import Menu from "./components/Menu";
 import Ventas from "./components/ventas/Ventas";
 import Inventario from "./components/Inventario";
 import Compras from "./components/compras/Compras";
+import TestDividir from "./TestDividir";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/Ventas" element={<Ventas />} />
           <Route path="/Inventario" element={<Inventario />} />
           <Route path="/Compras" element={<Compras />} />
+          <Route path="/Test" element={<TestDividir />} />
         </Routes>
       </Router>
     </>

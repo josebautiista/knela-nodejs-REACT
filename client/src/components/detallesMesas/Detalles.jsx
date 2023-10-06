@@ -167,7 +167,9 @@ export const Detalles = ({ idMesa }) => {
       <Encabezado
         setSelectedTable={setSelectedTable}
         selectedTable={selectedTable}
+        nuevo={nuevo}
       ></Encabezado>
+
       <DivContenedor>
         <Izquierdo
           agregarProducto={agregarProducto}

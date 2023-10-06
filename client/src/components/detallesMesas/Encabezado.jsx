@@ -3,6 +3,7 @@ import { useState } from "react";
 import CambiarMesa from "./CambiarMesa";
 import PropTypes from "prop-types";
 import { styled } from "styled-components";
+import Test from "../../Test";
 
 const DivContenedor = styled.div`
   text-align: center;
@@ -14,11 +15,17 @@ const DivContenedor = styled.div`
   }
 `;
 
-const Encabezado = ({ setSelectedTable, selectedTable }) => {
-  const [open, setOpen] = useState(false);
+const Encabezado = ({ setSelectedTable, selectedTable, nuevo }) => {
+  const [openCambiarMesa, setOpenCambiarMesa] = useState(false);
+  const [openTest, setOpenTest] = useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleOpenTestModal = () => {
+    setOpenTest(true);
+  };
+
+  // Función para abrir el modal de CambiarMesa
+  const handleOpenCambiarMesaModal = () => {
+    setOpenCambiarMesa(true);
   };
 
   return (
@@ -29,14 +36,25 @@ const Encabezado = ({ setSelectedTable, selectedTable }) => {
       >
         Mesa {selectedTable}
       </Typography>
-      <Button variant="contained" color="success" onClick={handleClickOpen}>
+      <Button
+        variant="contained"
+        color="success"
+        onClick={handleOpenCambiarMesaModal}
+      >
         Cambiar mesa
       </Button>
+      <Button variant="contained" color="success" onClick={handleOpenTestModal}>
+        Dividir Cuenta
+      </Button>
+      {/* Renderiza el componente Test y pasa las propiedades correctamente */}
+      <Test open={openTest} nuevo={nuevo} setOpenTest={setOpenTest} />
+
+      {/* Renderiza el componente CambiarMesa y pasa la prop openCambiarMesa */}
       <CambiarMesa
         selectedTable={selectedTable}
         setSelectedTable={setSelectedTable}
-        open={open}
-        setOpen={setOpen}
+        open={openCambiarMesa}
+        setOpen={setOpenCambiarMesa}
       />
     </DivContenedor>
   );
